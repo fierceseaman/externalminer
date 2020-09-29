@@ -783,7 +783,7 @@ var cM = {
         //push all top tier resources into queue
 
         while(requestQueue.length){
-//            console.log(requestQueue);
+            console.log(requestQueue);
             const requestedProduct = requestQueue.shift();
             const quantities = cM.getOrderQuantities(requestedProduct);
             const clearedToShip = cM.getOrderStatus(quantities, levelCache);
@@ -4487,16 +4487,14 @@ var rSB = {
         var tower = _.find(targets, site => site.structureType == STRUCTURE_TOWER);
         if(targets.length) {
             var target = targets[0];
-            if (spawns){
-                target = spawns;
-//            if (terminal){
-//                target = terminal;
+            if (terminal){
+                target = terminal;
             } else if (storage){
                 target = storage;
             } else if (extensions){
                 target = extensions;
-            } else if (terminal){
-                target = terminal;
+            } else if (spawns){
+                target = spawns;
             } else if(tower){
                 target = tower;
             }
@@ -5330,8 +5328,6 @@ var rLS = {
           }
           Memory.rooms[room.name].sources = {};
           var sources = creep.room.find(FIND_SOURCES);
-//          console.log(sources)
-//          console.log(JSON.stringify(sources));
           for(const source of sources){
           Memory.rooms[room.name].sources[source.id] = source.pos;
         }
@@ -5348,14 +5344,58 @@ var rLS = {
           }
         }
 
-//        for (const sourceID in Memory.rooms[room.name]sources) {
-//          const posStringified = Memory.rooms[room.name]sources[sourceID];
-//          const sourceObject = Game.getObjectById(sourceID);
-//        }
-
 };
 
 var lightScout = rLS;
+
+var rER = {
+    name: "externalRunner",
+    type: "externalRunner",
+    targetRoom: null,
+
+    /** @param {Creep} creep **/
+    run: function(creep) {
+      if(creep.memory.targetRoom == null){
+        if(creep.memory.city == "E7S90") {
+          creep.memory.targetRoom = "E8S9";
+        } else if(creep.memory.city == "W2S80") {
+        var W2S80runners = _.sum(Game.creeps, (c) => c.memory.targetRoom == "W2S9");
+        if(W2S80runners <= 2) {
+          creep.memory.targetRoom = "W2S9";
+        } else {
+          creep.memory.targetRoom = "W1S8";
+        }
+        } else if(creep.memory.city == "W1S70") {
+          creep.memory.targetRoom = "W2S7";
+        }
+      } else {
+        if(creep.store.energy == 0 && creep.memory.full){
+            creep.memory.full = false;
+        }
+        if(creep.store.energy == creep.store.getCapacity() && !creep.memory.full) {
+          creep.memory.full = true;
+      }
+      if (creep.memory.full){
+          actions_1.charge(creep, Game.spawns[creep.memory.city].room.storage);
+      } else {
+        //move to target room and pickup energy from containers
+        if (creep.room.name == creep.memory.targetRoom) {
+          var structures = creep.room.find(FIND_MY_STRUCTURE);
+          const containers = _.filter(structures, structure => structure.structureType === STRUCTURE_CONTAINER);
+//        var container = containers.sort(function(a,b) { return b.store.getUsedCapacity() - a.store.getUsedCapacity()})[0];
+          if (containers && containers.length) {
+            const container = _.max(containers, c => c.store.getUsedCapacity()); // One pass instead of a full sort
+            actions_1.withdraw(creep, container)
+        }
+      } else {
+          motion.newMove(creep, new RoomPosition(25, 25, creep.memory.targetRoom), 5);
+        }
+      }
+    }
+  }
+
+};
+var externalRunner = rER;
 
 var rEM = {
     name: "externalMiner",
@@ -5364,13 +5404,19 @@ var rEM = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
+      if(creep.spawning){
+          return
+      }
+      if(creep.ticksToLive == creep.memory.spawnBuffer + (creep.body.length * CREEP_SPAWN_TIME) && Game.spawns[creep.memory.city].memory.remoteMiner > 0) {
+          spawnQueue.respawn(creep);
+      }
       if(creep.memory.target == null){
         if(creep.memory.city == "E7S90") {
           creep.memory.target = "55c34a6b5be41a0a6e80c67c";
           creep.memory.sourceRoom = "E8S9";
         } else if(creep.memory.city == "W2S80") {
         var W2S80miners = _.sum(Game.creeps, (c) => c.memory.target == "55c34a6b5be41a0a6e80c2c0");
-        if(W2S80miners <= 3) {
+        if(W2S80miners <= 1) {
           creep.memory.target = "55c34a6b5be41a0a6e80c2c0";
           creep.memory.sourceRoom = "W2S9";
         } else {
@@ -5379,7 +5425,7 @@ var rEM = {
         }
         } else if(creep.memory.city == "W1S70") {
           var W1S70miners = _.sum(Game.creeps, (c) => c.memory.target == "55c34a6b5be41a0a6e80be61");
-          if(W1S70miners <= 3) {
+          if(W1S70miners <= 1) {
           creep.memory.target = "55c34a6b5be41a0a6e80be61";
           creep.memory.sourceRoom = "W2S7";
         }  else {
@@ -5388,19 +5434,45 @@ var rEM = {
         }
       }
       } else{
-
+        const cSites = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
         if(creep.store.energy == 0 && creep.memory.full){
             creep.memory.full = false;
         }
         if(creep.store.energy == creep.store.getCapacity() && !creep.memory.full) {
             creep.memory.full = true;
         }
-        if (creep.memory.full){
-            actions_1.charge(creep, Game.spawns[creep.memory.city].room.storage);
+        if (creep.memory.full && !cSites.length){
+          const needRepair = _.find(creep.room.find(FIND_STRUCTURES), structure => (structure.hits < (0.4*structure.hitsMax)) && (structure.structureType != STRUCTURE_WALL) && (structure.structureType != STRUCTURE_RAMPART) && (structure.structureType != STRUCTURE_ROAD));
+          if (needRepair){
+            return actions_1.repair(creep, needRepair)
+          } else {
+            var source = Game.getObjectById(creep.memory.target);
+            var structures = source.pos.findInRange(FIND_STRUCTURES, 2);
+            const container = _.filter(structures, structure => structure.structureType === STRUCTURE_CONTAINER && structure.pos.inRangeTo(source.pos, 3));
+            if (container.length > 1) {
+              creep.memory.container = source.pos.findClosestByRange(container).id;
+            } else if(container.length) {
+              creep.memory.container = container[0].id;
+            }
+          const storage = Game.getObjectById(creep.memory.container);
+          actions_1.charge(creep, storage);
+        }
+        } else if (creep.memory.full && cSites.length){
+          var targets = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
+          var storage = _.find(targets, site => site.structureType == STRUCTURE_STORAGE);
+          if(targets.length) {
+            var target = targets[0];
+            if (storage){
+                target = storage;
+              }
+          if(creep.build(target) == ERR_NOT_IN_RANGE) {
+              motion.newMove(creep, target.pos, 1);
+            }
+          }
         } else {
             rEM.harvestTarget(creep);
+          }
         }
-      }
     },
 
     harvestTarget: function(creep) {
@@ -5418,9 +5490,6 @@ var rEM = {
         else{
           motion.newMove(creep, source.pos, 2);
         }
-//        motion.newMove(creep, new RoomPosition(25, 25, creep.memory.sourceRoom), 10);
-//        creep.moveTo(new RoomPosition(25, 25, creep.memory.sourceRoom), {reusePath: 50});
-//        creep.moveTo(source, {reusePath: 50});
       }
       const harvestResult = actions_1.harvest(creep, source);
       if (harvestResult == 1){
@@ -5436,7 +5505,6 @@ var rEM = {
     }
     },
 };
-
 var externalMiner = rEM;
 
 var rRo = {
@@ -5481,13 +5549,7 @@ var rRo = {
                         if (valuables.length){
                             creep.memory.target = struct.id;
                             creep.memory.resource = valuables[0];
-                        } else {
-                          const dropped = _.find(creep.room.find(FIND_DROPPED_RESOURCES), r => r.resourceType == RESOURCE_ENERGY);
-                          if(dropped){
-                              actions_1.pick(creep, dropped);
-                              creep.memory.target = dropped
-                              return
-                          }
+                            break
                         }
                     }
                 }
@@ -5541,7 +5603,7 @@ var rr = {
     getRoles: function() {
         return [ferry, defender, transporter, remoteMiner, runner, upgrader, builder, quad, mineralMiner, claimer, unclaimer,
             spawnBuilder, harasser,medic, breaker, powerMiner,
-            robber, depositMiner, scout, externalMiner, lightScout]
+            robber, depositMiner, scout, externalMiner, lightScout, externalRunner]
     },
 
     getCoreRoles: function() {
@@ -5566,7 +5628,8 @@ function getRecipe(type, energyAvailable, room, boosted){
     d.quad = quadBody(energy, rcl, room, boosted);
     d.runner = scalingBody([2, 1], [CARRY, MOVE], energy);
     d.miner = minerBody(energy, rcl);
-    d.externalMiner = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];
+    d.externalMiner = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE];
+    d.externalRunner = scalingBody([2, 1], [CARRY, MOVE], energy);
     d.normal = upgraderBody(energy, rcl, room);
     d.transporter = scalingBody([2, 1], [CARRY, MOVE], energy, 30);
     d.builder = builderBody(energy, rcl);
@@ -6234,6 +6297,7 @@ function updateCountsCity(city, creeps, rooms, claimRoom, unclaimRoom) {
             updateStorageLink(spawn, memory, structures);
             updateexternalMiner(rooms, memory, spawn);
             updatelightScout(rooms, memory,spawn);
+            updateexternalRunner(rooms, memory, spawn);
         }
         makeEmergencyCreeps(extensions, creeps, city, rcl8, emergencyTime);
     }
@@ -6593,13 +6657,27 @@ function updateexternalMiner(rooms, memory, spawn){
   var numberofrEM = _.sum(Game.creeps, (c) => c.memory.roll == 'externalMiner');
   var room = spawn.room.name;
   if (room == "E7S9") {
-    memory[externalMiner.name] =3;
+    memory[externalMiner.name] = 1;
   } else if(room == "W2S8") {
-    memory[externalMiner.name] = 6;
+    memory[externalMiner.name] = 2;
   } else if (room == "W1S7") {
-    memory[externalMiner.name] = 6;
+    memory[externalMiner.name] = 2;
   }  else {
       memory[externalMiner.name] = 0;
+    }
+}
+
+function updateexternalRunner(rooms, memory, spawn){
+  var numberofrER = _.sum(Game.creeps, (c) => c.memory.roll == 'externalRunner');
+  var room = spawn.room.name;
+  if (room == "E7S9") {
+    memory[externalRunner.name] = 0;
+  } else if(room == "W2S8") {
+    memory[externalRunner.name] = 0;
+  } else if (room == "W1S7") {
+    memory[externalRunner.name] = 0;
+  }  else {
+      memory[externalRunner.name] = 0;
     }
 }
 
@@ -8641,6 +8719,7 @@ const ob = {
         if (!observer) return false
 
         ob.scanNextRoom(observer);
+        console.log("Scanning rooms.")
         return true
     },
 
@@ -8661,6 +8740,7 @@ const ob = {
 
     recordData: function(roomName, roomData) {
         const room = Game.rooms[roomName];
+        console.log("Recording room data")
         if (!room) { // We don't have vision for some reason
             return
         }
@@ -8764,6 +8844,7 @@ const ob = {
             return
         }
         const structures = Game.rooms[roomName].find(FIND_STRUCTURES);
+        console.log(structures)
         var modifier = (Math.random() ** (1/4)) * settings_1.bucket.range;
         if (Game.map.getRoomLinearDistance(Game.spawns[city].room.name, roomName) <= settings_1.powerMiningRange && Game.cpu.bucket >= settings_1.bucket.powerMining + modifier - (settings_1.bucket.range/2)) {
             ob.flagPowerBanks(structures, city, roomName);
@@ -8809,7 +8890,6 @@ const ob = {
         const powerBank = _.find(structures, structure => structure.structureType === STRUCTURE_POWER_BANK);
         console.log(powerBank)
         const flagName = city + "powerMine";
-        console.log(flagName)
         if (powerBank && powerBank.power > 1500 && powerBank.ticksToDecay > 2800 && !Memory.flags[flagName] &&
                 structures.length < 30 && Game.spawns[city].room.storage.store.energy > settings_1.energy.powerMine){
             const terrain = Game.rooms[roomName].getTerrain();
@@ -8832,6 +8912,7 @@ const ob = {
         if (!deposits.length) {
             return false
         }
+        console.log(deposits)
         const depositFlagName = city + "deposit";
         for (let i = 0; i < deposits.length; i++) {
             if(deposits[i].lastCooldown < 5 && !Memory.flags[depositFlagName] && !ob.checkFlags(deposits[i].pos)){
@@ -9201,6 +9282,7 @@ var loop = function () {
         }
         //clear rooms
         if (Game.time % 5000 === 0) {
+          console.log('Clearing Room Memory')
             for (const name in Memory.rooms) {
                 if (!Memory.rooms[name].city) {
                     delete Memory.rooms[name];
