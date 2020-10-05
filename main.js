@@ -783,7 +783,7 @@ var cM = {
         //push all top tier resources into queue
 
         while(requestQueue.length){
-            console.log(requestQueue);
+            console.log("Queue is", requestQueue);
             const requestedProduct = requestQueue.shift();
             const quantities = cM.getOrderQuantities(requestedProduct);
             const clearedToShip = cM.getOrderStatus(quantities, levelCache);
@@ -805,7 +805,7 @@ var cM = {
     getTopTier: function(citiesByFactoryLevel){
         const levels = Object.keys(citiesByFactoryLevel);
         const topTier = _.max(levels);
-        console.log(topTier);
+        console.log("Top Tier is", topTier);
         return _.filter(Object.keys(COMMODITIES), c => COMMODITIES[c].level == topTier && cM.isCommodity(c))
     },
 
@@ -840,7 +840,7 @@ var cM = {
 
     getDestination: function(product, citiesByFactoryLevel){
         //return roomName. destination must have less than 2k of all commodities and correct factoryLevel.
-        console.log(product);
+        console.log("Product is", product);
         const prodLvl = COMMODITIES[product].level;
         const components = _.without(Object.keys(COMMODITIES[product].components), RESOURCE_ENERGY);
         const destinations = _.filter(citiesByFactoryLevel[prodLvl], city =>
@@ -5355,20 +5355,33 @@ var rER = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
+      if(creep.memory.containerDistance && !creep.memory.full && creep.ticksToLive <= creep.memory.containerDistance){
+          creep.suicide();
+          spawnQueue.respawn(creep);
+          return
+      }
       if(creep.memory.targetRoom == null){
         if(creep.memory.city == "E7S90") {
           creep.memory.targetRoom = "E8S9";
         } else if(creep.memory.city == "W2S80") {
         var W2S80runners = _.sum(Game.creeps, (c) => c.memory.targetRoom == "W2S9");
-        if(W2S80runners <= 2) {
+        if(W2S80runners < 1) {
           creep.memory.targetRoom = "W2S9";
         } else {
           creep.memory.targetRoom = "W1S8";
         }
         } else if(creep.memory.city == "W1S70") {
-          creep.memory.targetRoom = "W2S7";
+          var W1S70runners = _.sum(Game.creeps, (c) => c.memory.targetRoom == "W2S7");
+          if(W1S70runners < 2) {
+            creep.memory.targetRoom = "W2S7";
+          } else {
+          creep.memory.targetRoom = "W1S6";
+        }
         }
       } else {
+        if(!creep.memory.containerDistance){
+            creep.memory.containerDistance = motion.getRoute(Game.spawns[creep.memory.city].pos.roomName, creep.memory.targetRoom, true).length * 50;
+        }
         if(creep.store.energy == 0 && creep.memory.full){
             creep.memory.full = false;
         }
@@ -5377,12 +5390,13 @@ var rER = {
       }
       if (creep.memory.full){
           actions_1.charge(creep, Game.spawns[creep.memory.city].room.storage);
-      } else {
+    } else {
         //move to target room and pickup energy from containers
         if (creep.room.name == creep.memory.targetRoom) {
-          var structures = creep.room.find(FIND_MY_STRUCTURE);
+          actions_1.notice(creep);
+          actions_1.pickup(creep);
+          var structures = creep.room.find(FIND_STRUCTURES);
           const containers = _.filter(structures, structure => structure.structureType === STRUCTURE_CONTAINER);
-//        var container = containers.sort(function(a,b) { return b.store.getUsedCapacity() - a.store.getUsedCapacity()})[0];
           if (containers && containers.length) {
             const container = _.max(containers, c => c.store.getUsedCapacity()); // One pass instead of a full sort
             actions_1.withdraw(creep, container)
@@ -5416,7 +5430,7 @@ var rEM = {
           creep.memory.sourceRoom = "E8S9";
         } else if(creep.memory.city == "W2S80") {
         var W2S80miners = _.sum(Game.creeps, (c) => c.memory.target == "55c34a6b5be41a0a6e80c2c0");
-        if(W2S80miners <= 1) {
+        if(W2S80miners < 1) {
           creep.memory.target = "55c34a6b5be41a0a6e80c2c0";
           creep.memory.sourceRoom = "W2S9";
         } else {
@@ -5425,12 +5439,16 @@ var rEM = {
         }
         } else if(creep.memory.city == "W1S70") {
           var W1S70miners = _.sum(Game.creeps, (c) => c.memory.target == "55c34a6b5be41a0a6e80be61");
-          if(W1S70miners <= 1) {
+          var W1S70miners2 = _.sum(Game.creeps, (c) => c.memory.target == "55c34a6b5be41a0a6e80be62");
+          if(W1S70miners < 1) {
           creep.memory.target = "55c34a6b5be41a0a6e80be61";
           creep.memory.sourceRoom = "W2S7";
-        }  else {
+        } else if (W1S70miners2 < 1) {
           creep.memory.target = "55c34a6b5be41a0a6e80be62";
           creep.memory.sourceRoom = "W2S7";
+        } else {
+          creep.memory.target = "55c34a6b5be41a0a6e80c076";
+          creep.memory.sourceRoom = "W1S6";
         }
       }
       } else{
@@ -5442,9 +5460,9 @@ var rEM = {
             creep.memory.full = true;
         }
         if (creep.memory.full && !cSites.length){
-          const needRepair = _.find(creep.room.find(FIND_STRUCTURES), structure => (structure.hits < (0.4*structure.hitsMax)) && (structure.structureType != STRUCTURE_WALL) && (structure.structureType != STRUCTURE_RAMPART) && (structure.structureType != STRUCTURE_ROAD));
+          const needRepair =  _.find(creep.pos.findInRange(FIND_STRUCTURES, 3), structure => (structure.hits < (0.4*structure.hitsMax)) && (structure.structureType != STRUCTURE_WALL) && (structure.structureType != STRUCTURE_RAMPART) && (structure.structureType != STRUCTURE_ROAD));
           if (needRepair){
-            return actions_1.repair(creep, needRepair)
+             return actions_1.repair(creep, needRepair)
           } else {
             var source = Game.getObjectById(creep.memory.target);
             var structures = source.pos.findInRange(FIND_STRUCTURES, 2);
@@ -5628,7 +5646,7 @@ function getRecipe(type, energyAvailable, room, boosted){
     d.quad = quadBody(energy, rcl, room, boosted);
     d.runner = scalingBody([2, 1], [CARRY, MOVE], energy);
     d.miner = minerBody(energy, rcl);
-    d.externalMiner = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE];
+    d.externalMiner = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE];
     d.externalRunner = scalingBody([2, 1], [CARRY, MOVE], energy);
     d.normal = upgraderBody(energy, rcl, room);
     d.transporter = scalingBody([2, 1], [CARRY, MOVE], energy, 30);
@@ -6295,9 +6313,9 @@ function updateCountsCity(city, creeps, rooms, claimRoom, unclaimRoom) {
             updateMineralMiner(rcl, structures, spawn, memory);
             updatePowerSpawn(city, memory);
             updateStorageLink(spawn, memory, structures);
-            updateexternalMiner(rooms, memory, spawn);
-            updatelightScout(rooms, memory,spawn);
-            updateexternalRunner(rooms, memory, spawn);
+//            updateexternalMiner(rooms, memory, spawn);
+//            updatelightScout(rooms, memory,spawn);
+//            updateexternalRunner(rooms, memory, spawn);
         }
         makeEmergencyCreeps(extensions, creeps, city, rcl8, emergencyTime);
     }
@@ -6653,47 +6671,47 @@ function updateMiner(rooms, rcl8, memory, spawn){
     memory[remoteMiner.name] = miners;
 }
 
-function updateexternalMiner(rooms, memory, spawn){
-  var numberofrEM = _.sum(Game.creeps, (c) => c.memory.roll == 'externalMiner');
-  var room = spawn.room.name;
-  if (room == "E7S9") {
-    memory[externalMiner.name] = 1;
-  } else if(room == "W2S8") {
-    memory[externalMiner.name] = 2;
-  } else if (room == "W1S7") {
-    memory[externalMiner.name] = 2;
-  }  else {
-      memory[externalMiner.name] = 0;
-    }
-}
+//function updateexternalMiner(rooms, memory, spawn){
+//  var numberofrEM = _.sum(Game.creeps, (c) => c.memory.roll == 'externalMiner');
+//  var room = spawn.room.name;
+//  if (room == "E7S9") {
+//    memory[externalMiner.name] = 1;
+//  } else if(room == "W2S8") {
+//    memory[externalMiner.name] = 2;
+//  } else if (room == "W1S7") {
+//    memory[externalMiner.name] = 3;
+//  }  else {
+//      memory[externalMiner.name] = 0;
+//    }
+//}
 
-function updateexternalRunner(rooms, memory, spawn){
-  var numberofrER = _.sum(Game.creeps, (c) => c.memory.roll == 'externalRunner');
-  var room = spawn.room.name;
-  if (room == "E7S9") {
-    memory[externalRunner.name] = 0;
-  } else if(room == "W2S8") {
-    memory[externalRunner.name] = 0;
-  } else if (room == "W1S7") {
-    memory[externalRunner.name] = 0;
-  }  else {
-      memory[externalRunner.name] = 0;
-    }
-}
+//function updateexternalRunner(rooms, memory, spawn){
+//  var numberofrER = _.sum(Game.creeps, (c) => c.memory.roll == 'externalRunner');
+//  var room = spawn.room.name;
+//  if (room == "E7S9") {
+//    memory[externalRunner.name] = 1;
+//  } else if(room == "W2S8") {
+//    memory[externalRunner.name] = 2;
+//  } else if (room == "W1S7") {
+//    memory[externalRunner.name] = 3;
+//  }  else {
+//      memory[externalRunner.name] = 0;
+//    }
+//}
 
-function updatelightScout(rooms, memory, spawn){
-  var numberofrLS = _.sum(Game.creeps, (c) => c.memory.roll == 'lightScout');
-  var room = spawn.room.name;
-  if (room == "E7S9") {
-    memory[lightScout.name] =1;
-  } else if(room == "W2S8") {
-    memory[lightScout.name] = 2;
-  } else if(room == "W1S7") {
-    memory[lightScout.name] = 2;
-  }  else {
-      memory[lightScout.name] = 0;
-    }
-}
+//function updatelightScout(rooms, memory, spawn){
+//  var numberofrLS = _.sum(Game.creeps, (c) => c.memory.roll == 'lightScout');
+//  var room = spawn.room.name;
+//  if (room == "E7S9") {
+//    memory[lightScout.name] =1;
+//  } else if(room == "W2S8") {
+//    memory[lightScout.name] = 2;
+//  } else if(room == "W1S7") {
+//    memory[lightScout.name] = 2;
+//  }  else {
+//      memory[lightScout.name] = 0;
+//    }
+//}
 
 function updateMineralMiner(rcl, buildings, spawn, memory) {
     memory[mineralMiner.name] = 0;
@@ -7303,10 +7321,11 @@ var markets = {
         const baseMins = [RESOURCE_HYDROGEN, RESOURCE_OXYGEN, RESOURCE_UTRIUM, RESOURCE_LEMERGIUM, RESOURCE_KEANIUM, RESOURCE_ZYNTHIUM, RESOURCE_CATALYST];
         const bars = [RESOURCE_UTRIUM_BAR, RESOURCE_LEMERGIUM_BAR, RESOURCE_ZYNTHIUM_BAR, RESOURCE_KEANIUM_BAR, RESOURCE_GHODIUM_MELT,
             RESOURCE_OXIDANT, RESOURCE_REDUCTANT, RESOURCE_PURIFIER, RESOURCE_CELL, RESOURCE_WIRE, RESOURCE_ALLOY, RESOURCE_CONDENSATE];
-        const highTier = [RESOURCE_ORGANISM, RESOURCE_MACHINE, RESOURCE_DEVICE, RESOURCE_ESSENCE, PIXEL];
+        const highTier = [RESOURCE_ORGANISM, RESOURCE_MACHINE, RESOURCE_DEVICE, RESOURCE_ESSENCE, PIXEL, CPU_UNLOCK];
 
         markets.updateSellPoint(highTier, termCities, buyOrders);
         markets.sellPixels(buyOrders)
+        markets.sellUnlocks(buyOrders)
 
         for (const city of termCities) {
             //if no terminal continue or no spawn
@@ -7556,6 +7575,22 @@ var markets = {
             Log.info("Sold pixels for: " + orders[0].price);
         }
     },
+
+    sellUnlocks: function(buyOrders){
+        const orders = markets.sortOrder(buyOrders[CPU_UNLOCK]).reverse();
+        if(orders.length && orders[0].price > Memory.sellPoint[CPU_UNLOCK]){
+            Game.market.deal(orders[0].id, Math.min(orders[0].remainingAmount, Game.resources[CPU_UNLOCK]));
+            Log.info("Sold CPU unlocks for: " + orders[0].price);
+        }
+    },
+
+//    sellUnlocks: function(buyOrders){
+//      const orders = markets.sortOrder(buyOrders[CPU_UNLOCK]).reverse();
+//      if(orders.length && orders[0].price > Memory.sellPoint[CPU_UNLOCK]){
+//        Game.market.deal(orders[0].id, Math.min(orders[0].remainingAmount, Game.resoures[CPU_UNLOCK]));
+//        Log.info("Sold CPU unlocks for: " + orders[0].price);
+//      }
+//    },
 
     buyPower: function(city, termUsed, sellOrders) {
         if (termUsed) {
@@ -8719,7 +8754,6 @@ const ob = {
         if (!observer) return false
 
         ob.scanNextRoom(observer);
-        console.log("Scanning rooms.")
         return true
     },
 
@@ -8740,7 +8774,6 @@ const ob = {
 
     recordData: function(roomName, roomData) {
         const room = Game.rooms[roomName];
-        console.log("Recording room data")
         if (!room) { // We don't have vision for some reason
             return
         }
@@ -8844,7 +8877,6 @@ const ob = {
             return
         }
         const structures = Game.rooms[roomName].find(FIND_STRUCTURES);
-        console.log(structures)
         var modifier = (Math.random() ** (1/4)) * settings_1.bucket.range;
         if (Game.map.getRoomLinearDistance(Game.spawns[city].room.name, roomName) <= settings_1.powerMiningRange && Game.cpu.bucket >= settings_1.bucket.powerMining + modifier - (settings_1.bucket.range/2)) {
             ob.flagPowerBanks(structures, city, roomName);
@@ -8912,7 +8944,6 @@ const ob = {
         if (!deposits.length) {
             return false
         }
-        console.log(deposits)
         const depositFlagName = city + "deposit";
         for (let i = 0; i < deposits.length; i++) {
             if(deposits[i].lastCooldown < 5 && !Memory.flags[depositFlagName] && !ob.checkFlags(deposits[i].pos)){
@@ -9282,7 +9313,6 @@ var loop = function () {
         }
         //clear rooms
         if (Game.time % 5000 === 0) {
-          console.log('Clearing Room Memory')
             for (const name in Memory.rooms) {
                 if (!Memory.rooms[name].city) {
                     delete Memory.rooms[name];
