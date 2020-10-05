@@ -5,7 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 var settings = {
-    allies: ["Atanner", "slowmotionghost", "Timendainum", "FeTiD", "Yoner"],
+    allies: [""],
     nukeStructures: [STRUCTURE_SPAWN, STRUCTURE_LAB, STRUCTURE_STORAGE, STRUCTURE_FACTORY,
         STRUCTURE_TERMINAL, STRUCTURE_POWER_SPAWN, STRUCTURE_NUKER],
     militaryBoosts:["XKHO2", "XGHO2", "XZHO2", "XLHO2", "XZH2O", "G"],
@@ -21,7 +21,7 @@ var settings = {
     upgradeBoostPrice: 15,
     powerBuyVolume: 5000, // amount of power we will buy at once
 
-    miningDisabled: ["W2N240"], //cities that will attempt any highway mining
+    miningDisabled: [""], //cities that will attempt any highway mining
     ghodiumAmount: 7000, //threshold to stop producing ghodium
     boostsNeeded: 6000, // boost needed per city for us to boost creeps
     boostAmount: 5000, //threshold to stop producing boosts (add ~8000 to this and ghodium amount since this does not include ready to go boosts in terminal)
@@ -206,13 +206,13 @@ var u = {
     iReservedOrOwn: function(roomName) {
         var room = Game.rooms[roomName];
         var hasController = room && room.controller;
-        return hasController && (room.controller.my || ((room.controller.reservation) && (room.controller.reservation.username == "Yoner")))
+        return hasController && (room.controller.my || ((room.controller.reservation) && (room.controller.reservation.username == "FierceSeaman")))
     },
     
     iReserved: function(roomName) {
         var room = Game.rooms[roomName];
         var hasController = room && room.controller;
-        return hasController && ((room.controller.reservation) && (room.controller.reservation.username == "Yoner"))
+        return hasController && ((room.controller.reservation) && (room.controller.reservation.username == "FierceSeaman"))
     },
 
     iOwn: function(roomName) {
@@ -791,7 +791,7 @@ var cM = {
         //push all top tier resources into queue
 
         while(requestQueue.length){
-            console.log(requestQueue);
+            console.log("Queue is", requestQueue);
             const requestedProduct = requestQueue.shift();
             const quantities = cM.getOrderQuantities(requestedProduct);
             const clearedToShip = cM.getOrderStatus(quantities, levelCache);
@@ -813,7 +813,7 @@ var cM = {
     getTopTier: function(citiesByFactoryLevel){
         const levels = Object.keys(citiesByFactoryLevel);
         const topTier = _.max(levels);
-        console.log(topTier);
+        console.log("Top Tier is", topTier);
         return _.filter(Object.keys(COMMODITIES), c => COMMODITIES[c].level == topTier && cM.isCommodity(c))
     },
 
@@ -848,7 +848,7 @@ var cM = {
 
     getDestination: function(product, citiesByFactoryLevel){
         //return roomName. destination must have less than 2k of all commodities and correct factoryLevel.
-        console.log(product);
+        console.log("Product is", product);
         const prodLvl = COMMODITIES[product].level;
         const components = _.without(Object.keys(COMMODITIES[product].components), RESOURCE_ENERGY);
         const destinations = _.filter(citiesByFactoryLevel[prodLvl], city => 
@@ -7729,6 +7729,7 @@ var statsLib = {
         if (Game.time % settings_1.statTime == 1){
             RawMemory.setActiveSegments([]);
             const stats = {};
+	    stats["game.time"] = Game.time;
             stats["cpu.getUsed"] = Game.cpu.getUsed();
             stats["cpu.bucket"] = Game.cpu.bucket;
             stats["gcl.progress"] = Game.gcl.progress;
@@ -8073,7 +8074,7 @@ const p = {
                 room.memory.plan.y = spawnPos.y + template.offset.y - template.buildings.spawn.pos[0].y;
             }
             const planFlag = Memory.flags.plan;
-            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == "Yoner"){
+            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == "FierceSeaman"){
                 room.memory.plan = {};
                 room.memory.plan.x = planFlag.x;
                 room.memory.plan.y = planFlag.y;
@@ -8302,7 +8303,7 @@ const p = {
     },
 
     tooCloseToSource: function(source) {
-        return source.pos.findInRange(FIND_SOURCES, 3).length > 1
+        return source.pos.findInRange(FIND_SOURCES, 1).length > 1
     },
 
     hasLink: function(pos, distance) {
@@ -8794,6 +8795,7 @@ const ob = {
                 //put a flag on it
                 Memory.flags[flagName] = powerBank.pos;
                 Log.info("Power Bank found in: " + roomName);
+		console.log("Power Bank found in: " + roomName)
             }
         }
     },
@@ -8814,6 +8816,8 @@ const ob = {
             if(deposits[i].lastCooldown < 5 && !Memory.flags[depositFlagName] && !ob.checkFlags(deposits[i].pos)){
                 Memory.flags[depositFlagName] = deposits[i].pos;
                 Game.spawns[city].memory.deposit = Math.floor(Math.pow((deposits[i].lastCooldown / 0.001), 1/1.2));
+		Log.info("Deposit found in: " + roomName);
+		console.log("Deposit found in: " + roomName)
                 break // only place one flag
             }
         }
@@ -9082,7 +9086,7 @@ commonjsGlobal.BuyToken = function(price) {
         resourceType: SUBSCRIPTION_TOKEN,
         price: price * 1e6,
         totalAmount: 1,
-        roomName: "E11S22" 
+        roomName: "E7S9" 
     });
 };
 commonjsGlobal.SpawnQuad = function(city, boosted){
@@ -9143,7 +9147,7 @@ var loop = function () {
         }
         error_1.reset();
 
-        if(Game.shard.name == "shard2" && Game.cpu.bucket > 9500){
+        if(Game.shard.name == "shard0" && Game.cpu.bucket > 9500){
             Game.cpu.generatePixel();
         }
         var localRooms = utils.splitRoomsByCity(); // only used for remote mining?
