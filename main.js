@@ -6,7 +6,7 @@ var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof win
 
 const username = Object.values(Game.structures).concat(Object.values(Game.creeps), Object.values(Game.powerCreeps), Object.values(Game.constructionSites))[0].owner.username;
 var settings = {
-    username: FierceSeaman,
+    username: "FierceSeaman",
     allies: [""],
     nukeStructures: [STRUCTURE_SPAWN, STRUCTURE_LAB, STRUCTURE_STORAGE, STRUCTURE_FACTORY,
         STRUCTURE_TERMINAL, STRUCTURE_POWER_SPAWN, STRUCTURE_NUKER],
@@ -23,7 +23,7 @@ var settings = {
     upgradeBoostPrice: 15,
     powerBuyVolume: 5000, // amount of power we will buy at once
 
-    miningDisabled: ["W2N240"], //cities that will attempt any highway mining
+    miningDisabled: [""], //cities that will attempt any highway mining
     ghodiumAmount: 7000, //threshold to stop producing ghodium
     boostsNeeded: 6000, // boost needed per city for us to boost creeps
     boostAmount: 5000, //threshold to stop producing boosts (add ~8000 to this and ghodium amount since this does not include ready to go boosts in terminal)
@@ -3609,7 +3609,7 @@ var rPC = {
     },
 
     initializePowerCreep: function(creep) {
-        if(Game.shard.name != "shard3") return
+        if(Game.shard.name != "shard0") return
         if (!creep.memory.city) {
             const cities = utils.getMyCities();
             const usedRooms = _(Game.powerCreeps)
@@ -7096,7 +7096,7 @@ var markets = {
         const highTier = [RESOURCE_ORGANISM, RESOURCE_MACHINE, RESOURCE_DEVICE, RESOURCE_ESSENCE, PIXEL];
         
         markets.updateSellPoint(highTier, termCities, buyOrders);
-        //markets.sellPixels(buyOrders)
+        markets.sellPixels(buyOrders)
         
         for (const city of termCities) {
             //if no terminal continue or no spawn
@@ -8136,7 +8136,7 @@ const p = {
                 room.memory.plan.y = spawnPos.y + template.offset.y - template.buildings.spawn.pos[0].y;
             }
             const planFlag = Memory.flags.plan;
-            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == "Yoner"){
+            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == settings_1.username){
                 room.memory.plan = {};
                 room.memory.plan.x = planFlag.x;
                 room.memory.plan.y = planFlag.y;
@@ -9145,7 +9145,7 @@ commonjsGlobal.BuyToken = function(price) {
         resourceType: SUBSCRIPTION_TOKEN,
         price: price * 1e6,
         totalAmount: 1,
-        roomName: "E11S22" 
+        roomName: "E7S9" 
     });
 };
 commonjsGlobal.SpawnQuad = function(city, boosted){
@@ -9206,7 +9206,7 @@ var loop = function () {
         }
         error_1.reset();
 
-        if(Game.shard.name == "shard2" && Game.cpu.bucket > 9500){
+        if(Game.shard.name == "shard0" && Game.cpu.bucket > 9500){
             Game.cpu.generatePixel();
         }
         var localRooms = utils.splitRoomsByCity(); // only used for remote mining?
