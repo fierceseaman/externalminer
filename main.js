@@ -4,7 +4,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
+const username = Object.values(Game.structures).concat(Object.values(Game.creeps), Object.values(Game.powerCreeps), Object.values(Game.constructionSites))[0].owner.username;
 var settings = {
+    username: "FierceSeaman",
     allies: [""],
     nukeStructures: [STRUCTURE_SPAWN, STRUCTURE_LAB, STRUCTURE_STORAGE, STRUCTURE_FACTORY,
         STRUCTURE_TERMINAL, STRUCTURE_POWER_SPAWN, STRUCTURE_NUKER],
@@ -79,7 +81,7 @@ var settings = {
 
 if(!Game.shard.name.includes("shard")){
     //botarena and swc custom settings
-    settings.allies = [];
+    settings.allies = [username];
 }
 
 var settings_1 = settings;
@@ -206,13 +208,13 @@ var u = {
     iReservedOrOwn: function(roomName) {
         var room = Game.rooms[roomName];
         var hasController = room && room.controller;
-        return hasController && (room.controller.my || ((room.controller.reservation) && (room.controller.reservation.username == "FierceSeaman")))
+        return hasController && (room.controller.my || ((room.controller.reservation) && (room.controller.reservation.username == settings_1.username)))
     },
     
     iReserved: function(roomName) {
         var room = Game.rooms[roomName];
         var hasController = room && room.controller;
-        return hasController && ((room.controller.reservation) && (room.controller.reservation.username == "FierceSeaman"))
+        return hasController && ((room.controller.reservation) && (room.controller.reservation.username == settings_1.username))
     },
 
     iOwn: function(roomName) {
@@ -1309,16 +1311,25 @@ var m = {
                 }
                 const goalList = goals.length ? goals : [goals];
                 for(const goal of goalList){
+                    if(goal.pos.roomName != roomName)
+                        continue
+                    const terrain = Game.map.getRoomTerrain(roomName);
                     const range = goal.range;
                     const minX = Math.max(goal.pos.x - range, 0);
                     const maxX = Math.min(goal.pos.x + range, 49);
                     const minY = Math.max(goal.pos.y - range, 0);
                     const maxY = Math.min(goal.pos.y + range, 49);
                     for(let i = minX; i <= maxX; i++){
-                        for(let j = minY; j <= maxY; j++){
-                            if(costs.get(i,j) < 255)
-                                costs.set(i,j, 1);
-                        }
+                        if(costs.get(i,minY) < 100 && !(terrain.get(i,minY) & TERRAIN_MASK_WALL))
+                            costs.set(i,minY, 1);
+                        if(costs.get(i,maxY) < 100 && !(terrain.get(i,maxY) & TERRAIN_MASK_WALL))
+                            costs.set(i,maxY, 1);
+                    }
+                    for(let i = minY; i <= maxY; i++){
+                        if(costs.get(minX,i) < 100 && !(terrain.get(minX,i) & TERRAIN_MASK_WALL))
+                            costs.set(minX,i, 1);
+                        if(costs.get(maxX, i) < 100 && !(terrain.get(maxX, i) & TERRAIN_MASK_WALL))
+                            costs.set(maxX, i, 1);
                     }
                 }
                 return costs
@@ -7781,7 +7792,6 @@ var statsLib = {
         if (Game.time % settings_1.statTime == 1){
             RawMemory.setActiveSegments([]);
             const stats = {};
-	    stats["game.time"] = Game.time;
             stats["cpu.getUsed"] = Game.cpu.getUsed();
             stats["cpu.bucket"] = Game.cpu.bucket;
             stats["gcl.progress"] = Game.gcl.progress;
@@ -8126,7 +8136,7 @@ const p = {
                 room.memory.plan.y = spawnPos.y + template.offset.y - template.buildings.spawn.pos[0].y;
             }
             const planFlag = Memory.flags.plan;
-            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == "FierceSeaman"){
+            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == settings_1.username){
                 room.memory.plan = {};
                 room.memory.plan.x = planFlag.x;
                 room.memory.plan.y = planFlag.y;
