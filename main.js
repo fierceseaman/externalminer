@@ -8366,7 +8366,7 @@ const p = {
     },
 
     tooCloseToSource: function(source) {
-        return source.pos.findInRange(FIND_SOURCES, 3).length > 1
+        return source.pos.findInRange(FIND_SOURCES, 1).length > 1
     },
 
     hasLink: function(pos, distance) {
