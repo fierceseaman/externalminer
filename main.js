@@ -3624,7 +3624,7 @@ var rPC = {
     },
 
     initializePowerCreep: function(creep) {
-        if(Game.shard.name != "shard3") return
+        if(Game.shard.name != "shard0") return
         if (!creep.memory.city) {
             const cities = utils.getMyCities();
             const usedRooms = _(Game.powerCreeps)
@@ -7115,7 +7115,7 @@ var markets = {
         const highTier = [RESOURCE_ORGANISM, RESOURCE_MACHINE, RESOURCE_DEVICE, RESOURCE_ESSENCE, PIXEL];
         
         markets.updateSellPoint(highTier, termCities, buyOrders);
-        //markets.sellPixels(buyOrders)
+        markets.sellPixels(buyOrders)
         
         for (const city of termCities) {
             //if no terminal continue or no spawn
@@ -7812,6 +7812,7 @@ var statsLib = {
             RawMemory.setActiveSegments([]);
             const stats = {};
             stats["cpu.getUsed"] = Game.cpu.getUsed();
+	    stats["game.time"] = Game.time;
             stats["cpu.bucket"] = Game.cpu.bucket;
             stats["gcl.progress"] = Game.gcl.progress;
             stats["gcl.progressTotal"] = Game.gcl.progressTotal;
@@ -8156,7 +8157,7 @@ const p = {
                 room.memory.plan.y = spawnPos.y + template.offset.y - template.buildings.spawn.pos[0].y;
             }
             const planFlag = Memory.flags.plan;
-            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == "Yoner"){
+            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == "settings_1.username"){
                 room.memory.plan = {};
                 room.memory.plan.x = planFlag.x;
                 room.memory.plan.y = planFlag.y;
@@ -8385,7 +8386,7 @@ const p = {
     },
 
     tooCloseToSource: function(source) {
-        return source.pos.findInRange(FIND_SOURCES, 3).length > 1
+        return source.pos.findInRange(FIND_SOURCES, 1).length > 1
     },
 
     hasLink: function(pos, distance) {
@@ -9166,7 +9167,7 @@ commonjsGlobal.BuyToken = function(price) {
         resourceType: SUBSCRIPTION_TOKEN,
         price: price * 1e6,
         totalAmount: 1,
-        roomName: "E11S22" 
+        roomName: "E7S9" 
     });
 };
 commonjsGlobal.SpawnQuad = function(city, boosted){
@@ -9227,7 +9228,7 @@ var loop = function () {
         }
         error_1.reset();
 
-        if(Game.shard.name == "shard2" && Game.cpu.bucket > 9500){
+        if(Game.shard.name == "shard0" && Game.cpu.bucket > 9500){
             Game.cpu.generatePixel();
         }
         var localRooms = utils.splitRoomsByCity(); // only used for remote mining?
