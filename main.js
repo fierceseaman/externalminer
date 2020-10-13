@@ -125,7 +125,7 @@ var u = {
             return false
         }
     },
-
+    
     getTransferLocations: function(creep) {
         var city = creep.memory.city;
         var spawn = Game.spawns[city];
@@ -134,7 +134,7 @@ var u = {
         //mineral miner error when in use                                        structure.structureType == STRUCTURE_SPAWN ||
                                                 structure.structureType == STRUCTURE_CONTAINER)
     },
-
+    
     getNextLocation: function(current, locations) {
         return (current + 1) % locations.length
     },
@@ -148,8 +148,8 @@ var u = {
         if (factory) return factory
 
         // look up uncached factory
-        const factories = room.find(FIND_STRUCTURES,{
-            filter: { structureType: STRUCTURE_FACTORY }
+        const factories = room.find(FIND_STRUCTURES,{ 
+            filter: { structureType: STRUCTURE_FACTORY } 
         });
         if (factories.length) {
             roomCache.factory = factories[0].id;
@@ -167,9 +167,9 @@ var u = {
 
         // 2. Container
         const container = Game.getObjectById(roomCache.container);
-        if (container) return container
-        const containers = room.find(FIND_STRUCTURES,{
-            filter: { structureType: STRUCTURE_CONTAINER }
+        if (container) return container     
+        const containers = room.find(FIND_STRUCTURES,{ 
+            filter: { structureType: STRUCTURE_CONTAINER } 
         });
         if (containers.length) {
             roomCache.container = containers[0].id;
@@ -178,11 +178,11 @@ var u = {
 
         // 3. Terminal
         if(room.terminal) return room.terminal
-
-        // 4. Spawn
+         
+        // 4. Spawn   
         const spawn = Game.getObjectById(roomCache.spawn);
         if (spawn) return spawn
-        const spawns = room.find(FIND_STRUCTURES, {
+        const spawns = room.find(FIND_STRUCTURES, { 
             filter: { structureType: STRUCTURE_SPAWN }
         });
         if (spawns.length) {
@@ -191,7 +191,7 @@ var u = {
         }
         return false
     },
-
+    
     getGoodPickups: function(creep) {
         var city = creep.memory.city;
         var localCreeps = u.splitCreepsByCity();
@@ -204,13 +204,13 @@ var u = {
         //Log.info(JSON.stringify(allRooms));
         return goodLoads
     },
-
+    
     iReservedOrOwn: function(roomName) {
         var room = Game.rooms[roomName];
         var hasController = room && room.controller;
         return hasController && (room.controller.my || ((room.controller.reservation) && (room.controller.reservation.username == settings_1.username)))
     },
-
+    
     iReserved: function(roomName) {
         var room = Game.rooms[roomName];
         var hasController = room && room.controller;
@@ -222,11 +222,11 @@ var u = {
         var hasController = room && room.controller;
         return hasController && room.controller.my
     },
-
+    
     enemyOwned: function(room) {
         return room.controller && room.controller.owner && !u.isFriendlyRoom(room)
     },
-
+    
     getDropTotals: function() {
         var rooms = Game.rooms;
         var drops = _.flatten(_.map(rooms, room => room.find(FIND_DROPPED_RESOURCES)));
@@ -240,12 +240,12 @@ var u = {
             }
         }
     },
-
+    
     splitCreepsByCity: function(){
         var creeps = _.filter(Game.creeps, creep => creep.my);
         return _.groupBy(creeps, creep => creep.memory.city)
     },
-
+    
     splitRoomsByCity: function(){
         var rooms = _.filter(Game.rooms, room => u.iReservedOrOwn(room.name));
         //Log.info(JSON.stringify(rooms));
@@ -264,7 +264,7 @@ var u = {
             return null
         }
     },
-
+    
     updateCheckpoints: function(creep) {
         if (Game.time % 50 == 0  && !u.enemyOwned(creep.room)) {
             if (creep.hits < creep.hitsMax) {
@@ -305,7 +305,7 @@ var u = {
     },
 
     findMultiRoomPath: function(startPos, endPos) {
-        return PathFinder.search(startPos, {pos: endPos, range: 1 },
+        return PathFinder.search(startPos, {pos: endPos, range: 1 }, 
             u.highwayMoveSettings(10000, 1, startPos, endPos))
     },
 
@@ -358,9 +358,9 @@ var u = {
     },
 
     isFriendlyRoom: function(room){
-        if(room.controller
+        if(room.controller 
             && (room.controller.my
-                || (room.controller.owner
+                || (room.controller.owner 
                     && settings_1.allies.includes(room.controller.owner.username))
                 || (room.controller.reservation
                     && settings_1.allies.includes(room.controller.reservation.username)))){
@@ -524,7 +524,7 @@ var u = {
                     if(i >= 0 && i <= 49 && j >= 0 && j <= 49){
                         const distance = Math.max(Math.abs(creep.pos.x - i),Math.abs(creep.pos.y - j));
                         switch(distance){
-                        case 0:
+                        case 0: 
                         case 1:
                             Tmp[creep.room.name].attacks.push({x: i, y: j, damage: damageMultiplier * 10});
                             break
@@ -562,6 +562,14 @@ var u = {
                 delete Memory.flags[flagName];
             }
         }
+    },
+
+    generateFlagName: function(baseName){
+        let counter = 0;
+        while(Memory.flags[baseName + counter]){
+            counter++;
+        }
+        return baseName + counter
     }
 };
 
@@ -830,7 +838,7 @@ var cM = {
     getOrderQuantities: function(product) {
         const compInfo = _.omit(COMMODITIES[product].components, RESOURCE_ENERGY);
         const components = Object.keys(compInfo);
-        const rate = factory.findRateLimit(components, product); //find rate limit, and use that to find quantity of each resource needed
+        const rate = factory.findRateLimit(components, product); //find rate limit, and use that to find quantity of each resource needed 
         return _(compInfo).mapValues(amount => amount * rate).value()
     },
 
@@ -853,7 +861,7 @@ var cM = {
         console.log(product);
         const prodLvl = COMMODITIES[product].level;
         const components = _.without(Object.keys(COMMODITIES[product].components), RESOURCE_ENERGY);
-        const destinations = _.filter(citiesByFactoryLevel[prodLvl], city =>
+        const destinations = _.filter(citiesByFactoryLevel[prodLvl], city => 
             _.every(components, comp => !city.terminal.store[comp] || city.terminal.store[comp] < 2000));
         const destination = destinations.length ? _.sample(destinations).name : null;
         return destination
@@ -935,9 +943,9 @@ var cM = {
                     if(factory.level){//only leveled factories need to send back components
                         for(const resource of Object.keys(city.terminal.store)){
                             //send back components
-                            if(COMMODITIES[resource]
-                                && !REACTIONS[resource]
-                                && resource != RESOURCE_ENERGY
+                            if(COMMODITIES[resource] 
+                                && !REACTIONS[resource] 
+                                && resource != RESOURCE_ENERGY 
                                 && COMMODITIES[resource].level != factory.level){
                                 const comLevel = COMMODITIES[resource].level || 0;
                                 const receiver = citiesByFactoryLevel[comLevel][0].name;
@@ -972,11 +980,11 @@ var template = {
         "terminal":{"pos":[{"x":20,"y":17}]},
         "extension":{
             "pos":[ // X: 13-25, Y: 12-22.
-                {"x":13,"y":12},{"x":14,"y":12},{"x":15,"y":12},{"x":16,"y":12},{"x":17,"y":12},{"x":21,"y":12},{"x":22,"y":12},
-                {"x":23,"y":12},{"x":24,"y":12},{"x":25,"y":12},{"x":13,"y":13},{"x":15,"y":13},{"x":17,"y":13},{"x":21,"y":13},
-                {"x":23,"y":13},{"x":25,"y":13},{"x":13,"y":14},{"x":14,"y":14},{"x":16,"y":14},{"x":17,"y":14},{"x":21,"y":14},
-                {"x":22,"y":14},{"x":24,"y":14},{"x":25,"y":14},{"x":13,"y":15},{"x":23,"y":15},{"x":25,"y":15},{"x":13,"y":16},
-                {"x":14,"y":16},{"x":15,"y":16},{"x":23,"y":16},{"x":24,"y":16},{"x":25,"y":16},{"x":23,"y":17},{"x":13,"y":18},
+                {"x":17,"y":14},{"x":17,"y":13},{"x":17,"y":12},{"x":16,"y":14},{"x":21,"y":14},{"x":15,"y":16},{"x":15,"y":13},
+                {"x":14,"y":14},{"x":16,"y":12},{"x":15,"y":12},{"x":14,"y":12},{"x":13,"y":12},{"x":13,"y":13},{"x":13,"y":14},
+                {"x":23,"y":13},{"x":25,"y":13},{"x":21,"y":13},{"x":13,"y":15},{"x":13,"y":16},{"x":14,"y":16},{"x":21,"y":12},
+                {"x":22,"y":14},{"x":24,"y":14},{"x":25,"y":14},{"x":23,"y":12},{"x":23,"y":15},{"x":25,"y":15},{"x":24,"y":12},
+                {"x":25,"y":12},{"x":22,"y":12},{"x":23,"y":16},{"x":24,"y":16},{"x":25,"y":16},{"x":23,"y":17},{"x":13,"y":18},
                 {"x":14,"y":18},{"x":15,"y":18},{"x":24,"y":18},{"x":25,"y":18},{"x":13,"y":19},{"x":15,"y":19},{"x":25,"y":19},
                 {"x":13,"y":20},{"x":14,"y":20},{"x":16,"y":20},{"x":17,"y":20},{"x":18,"y":20},{"x":20,"y":20},{"x":13,"y":21},
                 {"x":15,"y":21},{"x":17,"y":21},{"x":19,"y":21},{"x":25,"y":21},{"x":13,"y":22},{"x":14,"y":22},{"x":15,"y":22},
@@ -1032,12 +1040,12 @@ var m = {
         const routeVerified = m.checkRoute(creep, endPos);
         const pathVerified = m.checkPath(creep, endPos);
         //if creep thinks it moved last tick, but pos is the same, it's stuck/needs recalc
-        const moveFailed = (ccache.lastPos
-            && ccache.lastPos.isEqualTo(creep.pos)
-            && ccache.lastMove
+        const moveFailed = (ccache.lastPos 
+            && ccache.lastPos.isEqualTo(creep.pos) 
+            && ccache.lastMove 
             && ccache.lastMove == Game.time - 1);
         //if everything is good to go, MBP
-        if(pathVerified && routeVerified && !moveFailed){
+        if(pathVerified && routeVerified && !moveFailed){ 
             //check for portals
             if(!ccache.lastPos || ccache.lastPos.roomName == creep.pos.roomName
                 || !utils.isIntersection(creep.pos.roomName)){//if new room is an intersection, check for portals
@@ -1056,9 +1064,9 @@ var m = {
             if(Game.time % 50 != 0){
                 return
             }
-            ccache.pathFail = 0;
+            ccache.pathFail = 0; 
         }
-        const routeFound =
+        const routeFound = 
             m.getRouteAndPath(creep, endPos, avoidEnemies, range, boundingBox);
 
         if(routeFound){//if pathing successful, MBP
@@ -1100,7 +1108,7 @@ var m = {
                 Log.info(`No route from ${creep.pos} to ${endPos}`);
                 return false
             }
-            //we can assume that the route has length
+            //we can assume that the route has length 
             //since we already checked to make sure that we are not in the destination room
             //we can also assume that we are outside the first room in the route, since we just recalculated
             let goals;
@@ -1109,7 +1117,7 @@ var m = {
             } else {
                 const exits = utils.findExitPos(route[1].room, route[2].exit);
                 goals = _.map(exits, function(e) {
-                    return { pos: e, range: 0 }
+                    return { pos: e, range: 0 } 
                 });
             }
             const maxRooms = 16;
@@ -1235,14 +1243,14 @@ var m = {
             maxOps: 10000,
             roomCallback: function(roomName){
                 const roomData = utils.getsetd(roomDataCache, roomName, {});
-                if(roomData.owner && !settings_1.allies.includes(roomData.owner)
-                    && roomData.rcl
-                    && CONTROLLER_STRUCTURES[STRUCTURE_TOWER][roomData.rcl]
-                    && creep.memory.tolerance
-                    && creep.memory.tolerance > CONTROLLER_STRUCTURES[STRUCTURE_TOWER][roomData.rcl] * TOWER_POWER_ATTACK - (TOWER_POWER_ATTACK * TOWER_FALLOFF)){
+                if(roomData.owner && !settings_1.allies.includes(roomData.owner) 
+                    && roomData.rcl 
+                    && CONTROLLER_STRUCTURES[STRUCTURE_TOWER][roomData.rcl] 
+                    && (!creep.memory.tolerance 
+                    || creep.memory.tolerance < CONTROLLER_STRUCTURES[STRUCTURE_TOWER][roomData.rcl] * TOWER_POWER_ATTACK - (TOWER_POWER_ATTACK * TOWER_FALLOFF))){
                     return false
                 }
-                if(roomData.skLairs && roomData.rcl) return
+                if(roomData.skLairs && roomData.rcl) return false
                 if(Game.map.getRoomStatus(roomName).status != "normal"){
                     return false
                 }
@@ -1432,7 +1440,7 @@ var actions = {
             return result
         }
     },
-
+    
     reserve: function(creep, target){
         var city = creep.memory.city;
         if (Game.time % 2000 == 0){
@@ -1448,14 +1456,14 @@ var actions = {
     dismantle: function(creep, target){
         return actions.interact(creep, target, () => creep.dismantle(target), 1)
     },
-
+    
     attack: function(creep, target){
         return actions.interact(creep, target, () => creep.attack(target), 1)
     },
 
     enablePower: function(creep) {
-        return actions.interact(creep,
-            creep.room.controller,
+        return actions.interact(creep, 
+            creep.room.controller, 
             () => creep.enableRoom(creep.room.controller), 1)
     },
 
@@ -1466,7 +1474,7 @@ var actions = {
     renewPowerCreep: function(creep, target) {
         return actions.interact(creep, target, () => creep.renew(target), 1)
     },
-
+     
     withdraw: function(creep, location, mineral, amount) {
         if (mineral == undefined){
             if (!location || !location.store.getUsedCapacity(RESOURCE_ENERGY)) return ERR_NOT_ENOUGH_RESOURCES
@@ -1485,10 +1493,10 @@ var actions = {
     pick: function(creep, target){
         return actions.interact(creep, target, () => creep.pickup(target), 1)
     },
-
+    
     pickup: function(creep) {
         var goodLoads = utils.getGoodPickups(creep);
-
+        
         if(creep.memory.targetId) {
             var target = Game.getObjectById(creep.memory.targetId);
             if(_.contains(goodLoads, target)) {
@@ -1504,7 +1512,7 @@ var actions = {
             }
         }
         //Log.info("finding a target");
-
+        
         var newTargets = _.sortBy(goodLoads, drop => -1*drop.amount + 28*PathFinder.search(creep.pos, drop.pos).cost);
         //Log.info(newTargets)
         if (newTargets.length) {
@@ -1518,7 +1526,7 @@ var actions = {
         const location = creep.room.controller;
         return actions.interact(creep, location, () => creep.upgradeController(location), 3)
     },
-
+    
     charge: function(creep, location, local=false) {
         const store = creep.store;
         if (Object.keys(store).length > 1){
@@ -1577,7 +1585,7 @@ var actions = {
     repair: function(creep, target){
         return actions.interact(creep, target, () => creep.repair(target), 3)
     },
-
+    
     // Pick up stuff lying next to you as you pass by
     notice: function(creep) {
         var tombstones = creep.room.find(FIND_TOMBSTONES);
@@ -1603,7 +1611,7 @@ var actions = {
             return creep.pickup(closeStuff[0])
         }
     },
-
+    
     getBoosted: function(creep){
         if(creep.spawning){
             return
@@ -1637,9 +1645,9 @@ var actions = {
         var structures = creep.room.find(FIND_HOSTILE_STRUCTURES);
         var structGroups = _.groupBy(structures, structure => structure.structureType);
         var targetOrder = [STRUCTURE_SPAWN, STRUCTURE_TOWER, STRUCTURE_EXTENSION, STRUCTURE_LINK, STRUCTURE_POWER_SPAWN,
-            STRUCTURE_EXTRACTOR, STRUCTURE_LAB, STRUCTURE_TERMINAL, STRUCTURE_OBSERVER, STRUCTURE_NUKER, STRUCTURE_STORAGE,
+            STRUCTURE_EXTRACTOR, STRUCTURE_LAB, STRUCTURE_TERMINAL, STRUCTURE_OBSERVER, STRUCTURE_NUKER, STRUCTURE_STORAGE, 
             STRUCTURE_RAMPART];
-
+ 
         for (var i = 0; i < targetOrder.length; i++) {
             var type = targetOrder[i];
             var breakThese = structGroups[type];
@@ -1647,9 +1655,9 @@ var actions = {
                 creep.memory.target = breakThese[0].id;
                 return actions.dismantle(creep, breakThese[0]) // TODO break things in your way
             }
-        }
+        }     
     },
-
+    
     retreat: function(creep) {
         if(Game.time % 20 === 0){
             creep.memory.retreat = false;
@@ -1680,7 +1688,8 @@ var rL = {
         let storageLink = Game.getObjectById(links.store);
         let upgradeLink = Game.getObjectById(links.upgrade) || rcl < 7 || Game.time % 100 != 0;
         let sourceLinks = _.map(links.source, src => Game.getObjectById(src));
-        if (storageLink && upgradeLink && _.reduce(sourceLinks, (l, r) => l && r)) {
+        if ((storageLink && upgradeLink && _.reduce(sourceLinks, (l, r) => l && r))
+            && (sourceLinks.length == 2 || Game.time % 200 != 0)) {
             return
         } else {
             const realLinks = rL.findStructure(room, STRUCTURE_LINK);
@@ -1715,7 +1724,7 @@ var rL = {
 
         // Make transfers
         for (const sourceLink of sourceLinks) {
-            if (sourceLink.store.getUsedCapacity(RESOURCE_ENERGY) <=
+            if (sourceLink.store.getUsedCapacity(RESOURCE_ENERGY) <= 
                 sourceLink.store.getCapacity(RESOURCE_ENERGY) * 0.5) {
                 continue // sourceLink isn't full yet
             }
@@ -1738,8 +1747,8 @@ var rL = {
 
     getUpgradeLink: function(room) {
         if (room.controller.level < 7) return false
-        const links = rL.findNearStructures(room.controller.pos,
-            STRUCTURE_LINK,
+        const links = rL.findNearStructures(room.controller.pos, 
+            STRUCTURE_LINK, 
             rL.UPGRADE + rL.LINK);
         return links.length > 0 ? links[0] : undefined
     },
@@ -1784,11 +1793,16 @@ var sq = {
         return _.countBy(spawn.memory.sq, creep => creep.role)
     },
 
+    countByInfo: function(spawn, role, flag = null){
+        sq.initialize(spawn);
+        return _.filter(spawn.memory.sq, creep => creep.role == role && creep.flag == flag).length
+    },
+
     respawn: function(creep, boosted) {
         const spawn = Game.spawns[creep.memory.city];
         if(!spawn) return
         sq.initialize(spawn);
-        sq.schedule(spawn, creep.memory.role, boosted);
+        sq.schedule(spawn, creep.memory.role, boosted, creep.memory.flag);
     },
 
     initialize: function(spawn) {
@@ -1855,7 +1869,7 @@ var T = {
             }
         }
         return damage
-    },
+    }, 
 
     findToughs: function(creep){
         if(creep.className){//creep is PC
@@ -1883,7 +1897,7 @@ var T = {
 
     calcHeal: function(creep, healMap){
         return healMap[creep.pos.x][creep.pos.y]
-    },
+    },  
 
     generateHealMap: function(hostiles) {
         const map = [];
@@ -1979,15 +1993,15 @@ var rQ = {
             rQ.engage(creep);
             break
         }
-
+        
     },
-
+    
     init: function(creep){
         if(!creep.memory.state){
             creep.memory.state = CS.START;
         }
     },
-
+    
     checkBoost: function(creep){
         if(creep.memory.needBoost){
             creep.memory.state = CS.BOOST;
@@ -1995,11 +2009,11 @@ var rQ = {
             creep.memory.state = CS.FORM;
         }
     },
-
+    
     formUp: function(creep){
         //maybe creeps could make sure that their entire squad is spawned until determining a captain and forming up, until then
         //they would renew themselves (has to be done before boosting though)
-
+        
         //form up organization:     C 0
         //(byorder in jimmy list) 1 2
         if(creep.memory.captain){
@@ -2138,7 +2152,7 @@ var rQ = {
             return false
         }
     },
-
+    
     getRoomMatrix: function(roomName){
         //always return a copy of the room matrix, in case it needs to be modified
         if(!Cache[roomName]){
@@ -2169,7 +2183,7 @@ var rQ = {
                     }
                 }
             }
-
+            
             //if room is visible, fill in structure info
             if(Game.rooms[roomName]){
                 Game.rooms[roomName].find(FIND_STRUCTURES).forEach(function(struct) {
@@ -2195,7 +2209,7 @@ var rQ = {
                     }
                 });
             }
-
+            
             //loop through everything again, if value of pos is greater than any of the positions TOP, TOP_LEFT or LEFT, then reset those postions to the value of original pos
             for(let i = 0; i < 50; i++){
                 for(let j = 0; j < 50; j++){
@@ -2345,7 +2359,7 @@ var rQ = {
                 target = rQ.chooseNextTarget(everythingInRoom);
             }
         }
-
+        
         // TODO: Check for creeps in area and react to them. [#153]
 
         if(!target && creep.memory.targetPos && creep.pos.roomName == creep.memory.targetPos.roomName){
@@ -2440,9 +2454,9 @@ var rQ = {
             }
         });
         if (result.incomplete) return
-
+        
         const path = result.path;
-
+        
         const wallInPath = rQ.getWallInQuadPath(creep.room, path);
         if (wallInPath) {
             return wallInPath
@@ -2467,8 +2481,8 @@ var rQ = {
     getOverlappingStructures: function(room, pos) {
         const quadPoses = [[0, 0], [0, 1], [1, 0], [1, 1]];
         return _(quadPoses)
-            .map(quadPos => room.lookForAt(LOOK_STRUCTURES,
-                Math.min(pos.x + quadPos[0], 49),
+            .map(quadPos => room.lookForAt(LOOK_STRUCTURES, 
+                Math.min(pos.x + quadPos[0], 49), 
                 Math.min(pos.y + quadPos[1], 49)))
             .flatten()
             .value()
@@ -2517,7 +2531,7 @@ var rQ = {
         for(const roomName of Object.values(everythingByRoom)){
             const hostiles = _.filter(roomName.hostiles, hostile => !rQ.isUnderRampart(hostile));
             for(const creep of roomName.creeps){
-                if(_.find(hostiles, h => h.pos.isNearTo(creep.pos))
+                if(_.find(hostiles, h => h.pos.isNearTo(creep.pos)) 
                     || _.find(roomName.structures, s => s.owner && s.hits && s.pos.isNearTo(creep.pos))){
                     creep.rangedMassAttack();
                     utils.logDamage(creep, creep.pos, true);
@@ -2628,7 +2642,7 @@ var rQ = {
                     returnValue = Infinity;
                 } else {
                     const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
-                    const isHighway = (parsed[1] % 10 === 0) ||
+                    const isHighway = (parsed[1] % 10 === 0) || 
                                     (parsed[2] % 10 === 0);
                     const isMyRoom = Game.rooms[roomName] &&
                         Game.rooms[roomName].controller &&
@@ -2810,8 +2824,8 @@ var rQ = {
         for(let i = 0; i < highRoom.length; i++){
             let topLeft = true;
             for(let j = 0; j < highRoom.length; j++){//if creep is not top, left, or top left of every other creep, it is not the leader
-                if(highRoom[j].pos.getDirectionTo(highRoom[i]) != LEFT
-                    && highRoom[j].pos.getDirectionTo(highRoom[i]) != TOP_LEFT
+                if(highRoom[j].pos.getDirectionTo(highRoom[i]) != LEFT 
+                    && highRoom[j].pos.getDirectionTo(highRoom[i]) != TOP_LEFT 
                     && highRoom[j].pos.getDirectionTo(highRoom[i]) != TOP
                     && !highRoom[j].pos.isEqualTo(highRoom[i])){
                     topLeft = false;
@@ -2845,7 +2859,7 @@ var rQ = {
         //if all of the creeps in the squad are in the highest room, they must all be in the same room
         result.sameRoom = highRoom.length < quad.length ? false : true;
         return result
-    }
+    }    
 };
 var quad = rQ;
 
@@ -2967,6 +2981,7 @@ var rH = {
             actions_1.getBoosted(creep);
             return
         }
+        const flagName = creep.memory.flag || creep.memory.city + "harass";
         if(creep.hits < creep.hitsMax * 0.2 && !creep.memory.reinforced){
             creep.memory.reinforced = true;
             spawnQueue.respawn(creep, true);
@@ -2977,15 +2992,15 @@ var rH = {
         }
         if(Game.time % 51 == 0){
             //check to remove flag and respawn
-            rH.removeFlag(creep);
-            if(Memory.flags[creep.memory.city + "harass"] && !creep.memory.respawnTime){
-                const route = motion.getRoute(Memory.flags[creep.memory.city + "harass"].roomName, Game.spawns[creep.memory.city].room.name, true);
+            rH.removeFlag(creep, flagName);
+            if(Memory.flags[flagName] && !creep.memory.respawnTime){
+                const route = motion.getRoute(Memory.flags[flagName].roomName, Game.spawns[creep.memory.city].room.name, true);
                 if(route && route.length){
                     creep.memory.respawnTime = (route.length * 50) + (creep.body.length * CREEP_SPAWN_TIME);
                 }
             }
         }
-        if(creep.memory.respawnTime && creep.ticksToLive == creep.memory.respawnTime && Memory.flags[creep.memory.city + "harass"]){
+        if(creep.memory.respawnTime && creep.ticksToLive == creep.memory.respawnTime && Memory.flags[flagName]){
             const reinforcement = _.find(creep.room.find(FIND_MY_CREEPS), c => c.memory.role == rH.name && c.name != creep.name);
             if(!reinforcement){
                 spawnQueue.respawn(creep);
@@ -2998,19 +3013,19 @@ var rH = {
         const hostiles = _.filter(creep.room.find(FIND_HOSTILE_CREEPS), c => !settings_1.allies.includes(c.owner.username));
         rH.maybeHeal(creep, hostiles);
         if(!hostiles.length){
-            if(Memory.flags[creep.memory.city + "harass"] && creep.room.name == Memory.flags[creep.memory.city + "harass"].roomName){
+            if(Memory.flags[flagName] && creep.room.name == Memory.flags[flagName].roomName){
                 const hostileStructures = creep.room.find(FIND_HOSTILE_STRUCTURES);
                 if(hostileStructures.length){
                     if(!Game.getObjectById(creep.memory.target)){
                         creep.memory.target = hostileStructures[0].id;
                     }
                 } else {
-                    if(rH.rally(creep)){
+                    if(rH.rally(creep, flagName)){
                         return
                     }
                 }
             } else {
-                if(rH.rally(creep)){
+                if(rH.rally(creep, flagName)){
                     return
                 }
             }
@@ -3121,8 +3136,7 @@ var rH = {
         //move toward an enemy
     },
 
-    removeFlag: function(creep){
-        const flagName = creep.memory.city + "harass";
+    removeFlag: function(creep, flagName){
         if(!Memory.flags[flagName]){
             return
         }
@@ -3153,9 +3167,8 @@ var rH = {
         }
     },
 
-    rally: function(creep){
-        const destFlagName = creep.memory.city + "harass";
-        const dFlag = Memory.flags[destFlagName];
+    rally: function(creep, flagName){
+        const dFlag = Memory.flags[flagName];
         if (dFlag){
             if(creep.pos.roomName === dFlag.roomName){
                 //move to center of room
@@ -3172,7 +3185,7 @@ var rH = {
         }
         return false
     }
-
+   
 };
 var harasser = rH;
 
@@ -3188,9 +3201,9 @@ var rD = {
     name: "defender",
     type: "defender",
     boosts: [RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
-        RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,
+        RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, 
         RESOURCE_CATALYZED_KEANIUM_ALKALIDE],
-
+   
     /** @param {Creep} creep **/
     run: function(creep) {//modified harasser
         const city = creep.memory.city;
@@ -3296,7 +3309,7 @@ var rB = {
         }
 
         const rcl = Game.spawns[creep.memory.city].room.controller.level;
-
+        
         rB.decideWhetherToBuild(creep);
         if(creep.memory.building){
             if(!rB.build(creep)){
@@ -3316,7 +3329,7 @@ var rB = {
         if (needRepair) {
             creep.memory.repair = needRepair.id;
             return actions_1.repair(creep, needRepair)
-        } else if(Game.time % 100 == 0
+        } else if(Game.time % 100 == 0 
             && !Game.spawns[creep.memory.city].room.find(FIND_MY_CONSTRUCTION_SITES).length ){
             creep.memory.role = upgrader.name;
         }
@@ -3346,11 +3359,12 @@ var rB = {
                 creep.memory.build = null;
             }
         }
-        if(Game.time % 20 === 0){//occasionally scan for construction sites
+        if(!creep.memory.nextCheckTime || creep.memory.nextCheckTime < Game.time){//occasionally scan for construction sites
             //if room is under siege (determined by presence of a defender),
             // ignore any construction sites outside of wall limits
             var targets = Game.spawns[creep.memory.city].room.find(FIND_MY_CONSTRUCTION_SITES);
-            var siege = _.find(creep.room.find(FIND_MY_CREEPS), c => c.memory.role == defender.name);
+            var siege = _.find(creep.room.find(FIND_MY_CREEPS), c => c.memory.role == defender.name) 
+                && Game.spawns[creep.memory.city].room.controller.safeMode;
             if(siege){
                 const plan = creep.room.memory.plan;
                 targets = _.reject(targets, site => site.pos.x > plan.x + template.dimensions.x + template.wallDistance
@@ -3363,6 +3377,7 @@ var rB = {
                 creep.memory.build = targetsByCost[0].id;
                 return true
             }
+            creep.memory.nextCheckTime = Game.time + 100;
         }
         return false
     },
@@ -3450,7 +3465,7 @@ var rU = {
 
     checkConstruction: function(creep){
         if(!creep.memory.boosted){
-            if(creep.room.find(FIND_MY_CONSTRUCTION_SITES).length
+            if(creep.room.find(FIND_MY_CONSTRUCTION_SITES).length 
                 && creep.room.controller.ticksToDowngrade > 3000){
                 creep.memory.role = builder.name;
             }
@@ -3609,7 +3624,7 @@ var rPC = {
     },
 
     initializePowerCreep: function(creep) {
-        if(Game.shard.name != "shard0") return
+        if(Game.shard.name != "shard3") return
         if (!creep.memory.city) {
             const cities = utils.getMyCities();
             const usedRooms = _(Game.powerCreeps)
@@ -3638,7 +3653,7 @@ var rPC = {
     },
 
     hasValidState: function(creep) { // TODO. false if creep spawns in city with no power spawn
-        const validSpawn = creep.memory.state == CS$2.START ||
+        const validSpawn = creep.memory.state == CS$2.START || 
                          creep.memory.state == CS$2.SPAWN || (creep.room && creep.room.controller);
         const initialized = creep.memory.state && creep.memory.city;
         return initialized && validSpawn
@@ -3803,7 +3818,7 @@ var rR = {
                 return
             }
             //check for flag
-            const flagName = creep.memory.city + "powerMine";
+            const flagName = creep.memory.flag || creep.memory.city + "powerMine";
             const flag = Memory.flags[flagName];
             if (flag && flag.roomName !== creep.pos.roomName){
                 //move to flag range 5
@@ -3849,9 +3864,9 @@ var rR = {
                 Game.spawns[creep.memory.city].memory.runner = 0;
                 creep.suicide();
             }
-
+            
         }
-        // notice if there's stuff next to you before wandering off!
+        // notice if there's stuff next to you before wandering off!  
         if (Game.time % 2) {
             actions_1.notice(creep); // cost: 15% when running, so 7% now
         }
@@ -3892,14 +3907,14 @@ var rR = {
     flipTarget: function(creep) {
         creep.memory.target = utils.getNextLocation(creep.memory.target, utils.getTransferLocations(creep));
     }
-
+    
 };
 var runner = rR;
 
 var rMe = {
     name: "medic",
     type: "medic",
-    boosts: [RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
+    boosts: [RESOURCE_CATALYZED_GHODIUM_ALKALIDE, 
         RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE],
 
     /** @param {Creep} creep **/
@@ -3916,7 +3931,7 @@ var rMe = {
             }
             //if creep not matched, wait to be picked up
         }
-    },
+    },  
 
     init: function(creep){
         if (!creep.memory.partner){
@@ -3934,16 +3949,16 @@ var rMe = {
     }
 
 
-
+   
 };
 var medic = rMe;
 
 var rBr = {
     name: "breaker",
     type: "breaker",
-    boosts: [RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
+    boosts: [RESOURCE_CATALYZED_GHODIUM_ALKALIDE, 
         RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, RESOURCE_CATALYZED_ZYNTHIUM_ACID],
-
+   
     /** @param {Creep} creep **/
     run: function(creep) {
         if(creep.memory.needBoost && !creep.memory.boosted){
@@ -3974,7 +3989,7 @@ var rBr = {
                 }
             }
         }
-        //attempt to break target,
+        //attempt to break target, 
         //if target is not in range and there is another valid target in range, break new valid target
         //if target cannot be pathed to, choose new target to be saved as target
         rBr.breakStuff(creep, target);
@@ -4039,10 +4054,10 @@ var rBr = {
             return
         }
         // if next to enemy structure, break it
-        const structures = creep.room.lookForAtArea(LOOK_STRUCTURES,
+        const structures = creep.room.lookForAtArea(LOOK_STRUCTURES, 
             Math.max(0, creep.pos.y - 1),
-            Math.max(0, creep.pos.x - 1),
-            Math.min(49, creep.pos.y + 1),
+            Math.max(0, creep.pos.x - 1), 
+            Math.min(49, creep.pos.y + 1), 
             Math.min(49, creep.pos.x + 1), true); //returns an array of structures
         if(structures.length){
             creep.dismantle(structures[0].structure);
@@ -4155,9 +4170,9 @@ var rBr = {
             }
         });
         if (result.incomplete) return false
-
+        
         const path = result.path;
-
+        
         const wallInPath = rBr.getWallInPath(creep.room, path);
         if (wallInPath) {
             return wallInPath
@@ -4199,8 +4214,8 @@ var rBr = {
             delete Memory.flags[flag];
         }
         //if in a friendly room or my room, ignore structures and rally. Else, set nearest structure as target
-        if(creep.room.controller && creep.room.controller.owner
-                && (settings_1.allies.includes(creep.room.controller.owner.username)
+        if(creep.room.controller && creep.room.controller.owner 
+                && (settings_1.allies.includes(creep.room.controller.owner.username) 
                 || creep.room.controller.my)){
             rBr.rally(creep, medic, flag);
         } else {
@@ -4240,7 +4255,7 @@ var rBr = {
         } else {
             medic.heal(medic);
         }
-    }
+    } 
 };
 var breaker = rBr;
 
@@ -4283,7 +4298,7 @@ var rPM = {
         const canMove = breaker.canMove(creep, medic);
 
         let bank = Game.getObjectById(creep.memory.target);//target is pBank
-        if(!bank)
+        if(!bank) 
             bank = rPM.findBank(creep, flagName);
         const flag = Memory.flags[flagName];
         if(!flag)
@@ -4301,9 +4316,11 @@ var rPM = {
         }
         const hostile = rPM.roomScan(creep);
         if(hostile && (hostile.pos.inRangeTo(medic.pos, 3) || hostile.pos.inRangeTo(creep.pos, 3))){
-            const harassFlag = creep.memory.city + "harass";
-            if(!Memory.flags[harassFlag])
+            if(!creep.memory.reinforced){
+                const harassFlag = utils.generateFlagName(creep.memory.city + "harass");
                 Memory.flags[harassFlag] = new RoomPosition(25, 25, creep.room.name);
+                creep.memory.reinforced = true;
+            }
             creep.attack(hostile);
             breaker.heal(creep,medic);
             if(canMove)
@@ -4357,7 +4374,7 @@ var rPM = {
             creep.memory.bankInfo.runnersSummoned = true;
             spawnQueue.initialize(Game.spawns[creep.memory.city]);
             for(let i = 0; i < creep.memory.bankInfo.runnersNeeded; i++){
-                spawnQueue.schedule(Game.spawns[creep.memory.city], runner.name);
+                spawnQueue.schedule(Game.spawns[creep.memory.city], runner.name, false, creep.memory.flag);
             }
         }
     },
@@ -4385,8 +4402,8 @@ var rPM = {
         if(!creep.memory.aware && Game.time % 5 != 0){
             return null
         }
-        const hostiles = _.filter(creep.room.find(FIND_HOSTILE_CREEPS), c => settings_1.allies.includes(creep.owner.username)
-            && c.pos.inRangeTo(creep.pos, 9)
+        const hostiles = _.filter(creep.room.find(FIND_HOSTILE_CREEPS), c => settings_1.allies.includes(creep.owner.username) 
+            && c.pos.inRangeTo(creep.pos, 9) 
             && (c.getActiveBodyparts(ATTACK) > 0 || c.getActiveBodyparts(RANGED_ATTACK) > 0 || c.pos.isNearTo(creep.pos)));
         if(!hostiles.length){
             creep.memory.aware = false;
@@ -4464,10 +4481,9 @@ var rDM = {
         switch(creep.memory.target){
         case 0: {
             //newly spawned or empty store
-            const flagName = creep.memory.city + "deposit";
+            const flagName = creep.memory.flag;
             const flag = Memory.flags[flagName];
             if(!flag){//if there is no flag, change city.memory.depositMiner to 0, and suicide
-                Game.spawns[creep.memory.city].memory.depositMiner = 0;
                 creep.suicide();
                 return
             }
@@ -4505,10 +4521,10 @@ var rDM = {
                 }
                 creep.memory.mined += works;
                 // update city level tracker for planning purposes
-                if(!Game.spawns[creep.memory.city].memory.deposit){
-                    Game.spawns[creep.memory.city].memory.deposit = 0;
+                if(!Memory.flags[creep.memory.flag].harvested){
+                    Memory.flags[creep.memory.flag].harvested = 0;
                 }
-                Game.spawns[creep.memory.city].memory.deposit = Game.spawns[creep.memory.city].memory.deposit + works;
+                Memory.flags[creep.memory.flag].harvested += works;
             }
             break
         }
@@ -4531,20 +4547,19 @@ var rDM = {
                 return
             }
             const dangerous = _.find(hostiles, h => h.getActiveBodyparts(ATTACK) > 0 || h.getActiveBodyparts(RANGED_ATTACK) > 0);
-
+            
             //check for tampering with deposit
             const cooldown = deposit.lastCooldown;
-            const expected = Math.ceil(0.001*Math.pow(Game.spawns[creep.memory.city].memory.deposit,1.2));
+            const expected = Math.ceil(0.001*Math.pow(Memory.flags[creep.memory.flag].harvested,1.2));
 
             if(cooldown > expected){
-                Game.spawns[creep.memory.city].memory.deposit = Math.floor(Math.pow((deposit.lastCooldown / 0.001), 1/1.2));
+                Memory.flags[creep.memory.flag].harvested = Math.ceil(Math.pow((deposit.lastCooldown / 0.001), 1/1.2));
             }
             if(cooldown > expected || dangerous){
                 //call in harasser
-                const flagName = creep.memory.city + "harass";
-                if(!Memory.flags[flagName]){
+                const flagName = utils.generateFlagName(creep.memory.city + "harass");
+                if(!_.find(Memory.flags, flag => flag.roomName == creep.room.name))
                     Memory.flags[flagName] = new RoomPosition(25, 25, creep.room.name);
-                }
             }
         }
     },
@@ -4560,11 +4575,11 @@ var rDM = {
         });
         if (ally) {
             //remove flag
+            const flag = Memory.flags[creep.memory.flag];
             const allies = _.filter(creep.room.find(FIND_HOSTILE_CREEPS), c => settings_1.allies.includes(c.owner.username));
             for(const friendly of allies){
-                if(friendly.getActiveBodyparts(WORK) > 0){
-                    const flagName = creep.memory.city + "deposit";
-                    delete Memory.flags[flagName];
+                if(friendly.getActiveBodyparts(WORK) > 0 && friendly.pos.isNearTo(flag.x, flag.y)){
+                    delete Memory.flags[creep.memory.flag];
                     creep.memory.target = 1;
                     return true
                 }
@@ -4674,9 +4689,9 @@ var rSB = {
         const cSites = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
         return (extensions.length > 4 && !cSites.length)
     },
-
+    
     build: function(creep) {
-        if(creep.room.controller && creep.room.controller.level < 2
+        if(creep.room.controller && creep.room.controller.level < 2 
             || creep.room.controller.ticksToDowngrade < CONTROLLER_DOWNGRADE[creep.room.controller.level] - 5000
             || (creep.room.controller.ticksToDowngrade < CONTROLLER_DOWNGRADE[creep.room.controller.level] - 1000 && creep.pos.inRangeTo(creep.room.controller.pos, 3))){
             if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
@@ -4694,8 +4709,8 @@ var rSB = {
             var target = targets[0];
             if (terminal){
                 target = terminal;
-              } else if (spawn){
-                  target = spawn;
+            } else if (spawn){
+                target = spawn;
             } else if (extensions){
                 target = extensions;
             } else if (storage){
@@ -4710,9 +4725,9 @@ var rSB = {
             if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                 motion.newMove(creep, creep.room.controller.pos, 3);
             }
-        }
+        }  
     },
-
+    
     harvest: function(creep) {
         const terminal = creep.room.terminal;
         if(terminal && terminal.store[RESOURCE_ENERGY] >= creep.store.getCapacity()){
@@ -4775,7 +4790,7 @@ var rC = {
             motion.newMove(creep, new RoomPosition(flag.x, flag.y, flag.roomName), 5);
         } else if (!creep.pos.isNearTo(creep.room.controller.pos)) {
             motion.newMove(creep, creep.room.controller.pos, 1);
-        } else {
+        } else { 
             actionFn(creep);
         }
         return true
@@ -4788,7 +4803,7 @@ var rC = {
         if(creep.claimController(creep.room.controller) == ERR_INVALID_TARGET && !creep.room.controller.my){
             creep.attackController(creep.room.controller);
         }
-    }
+    }    
 };
 var claimer = rC;
 
@@ -4798,7 +4813,7 @@ var rUC = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
-        return claimer.claimRally(creep, Memory.flags.unclaimRally) ||
+        return claimer.claimRally(creep, Memory.flags.unclaimRally) || 
                 claimer.runClaimer(creep, Memory.flags.unclaim, rUC.unclaim)
     },
 
@@ -4811,7 +4826,7 @@ var rUC = {
             Game.spawns[creep.memory.city].memory[rUC.name] = 0;
             creep.suicide();
         }
-    }
+    }    
 };
 var unclaimer = rUC;
 
@@ -4863,7 +4878,7 @@ var rF = {
                 actions_1.charge(creep, creep.room.terminal);
                 break
             }
-            if(creep.room.storage.store[creep.memory.mineral] > 0
+            if(creep.room.storage.store[creep.memory.mineral] > 0 
                 && creep.room.terminal.store[creep.memory.mineral] < rF.TERMINAL_MAX_MINERAL_AMOUNT - rF.FERRY_CARRY_AMOUNT
                 && _.sum(creep.room.terminal.store) < 295000){
                 actions_1.withdraw(creep, creep.room.storage, creep.memory.mineral);
@@ -4893,7 +4908,7 @@ var rF = {
                 creep.memory.target = rF.getJob(creep);
             }
             break
-        }
+        } 
         case 5:
             //move energy from storage link to storage
             if (creep.store.energy > 0){
@@ -4918,9 +4933,9 @@ var rF = {
             break
         case 7: {
             //move mineral from lab to terminal
-
+            
             break
-        }
+        }  
         case 8:
             //load up the nuker
             if (_.sum(creep.store) > 0){
@@ -5002,7 +5017,7 @@ var rF = {
                 break
             }
             const factory = Game.getObjectById(creep.memory.lab);
-            actions_1.withdraw(creep, factory, creep.memory.mineral, Math.min(creep.memory.quantity, creep.store.getCapacity()));
+            actions_1.withdraw(creep, factory, creep.memory.mineral, Math.min(creep.memory.quantity, creep.store.getCapacity())); 
 
             break
         }
@@ -5032,10 +5047,10 @@ var rF = {
             } else {//job done: link has energy and creep is empty
                 creep.say("getJob");
             }
-            break
+            break 
         }
     },
-
+    
     getJob: function(creep){
         if (creep.ticksToLive < 50){
             creep.suicide();
@@ -5065,8 +5080,8 @@ var rF = {
         if (Game.spawns[creep.memory.city].memory.ferryInfo.needPower === true && Game.spawns[creep.memory.city].room.terminal.store[RESOURCE_POWER] > 0){
             return 4
         }
-        if(Game.spawns[creep.memory.city].memory.ferryInfo.labInfo
-            && Game.spawns[creep.memory.city].memory.ferryInfo.labInfo.reactors
+        if(Game.spawns[creep.memory.city].memory.ferryInfo.labInfo 
+            && Game.spawns[creep.memory.city].memory.ferryInfo.labInfo.reactors 
             && Game.spawns[creep.memory.city].memory.ferryInfo.labInfo.receivers){
             const reactors = Object.keys(Game.spawns[creep.memory.city].memory.ferryInfo.labInfo.reactors);
             const reactorInfo = Object.values(Game.spawns[creep.memory.city].memory.ferryInfo.labInfo.reactors);
@@ -5129,7 +5144,7 @@ var rF = {
             for(const mineral of Object.keys(creep.room.terminal.store)){
                 if(creep.room.terminal.store[mineral] > rF.TERMINAL_MAX_MINERAL_AMOUNT && mineral != RESOURCE_ENERGY){
                     creep.memory.mineral = mineral;
-                    return 6
+                    return 6 
                 }
             }
         }
@@ -5146,7 +5161,7 @@ var rF = {
                     }
                     if(transfer[i][1] === 1){//move component from terminal to factory OR request mineral if no mineral request
                         //if compenent that is needed is not in terminal, do not request, component will be delivered by empire manager
-                        if(creep.room.terminal.store[transfer[i][0]] >= transfer[i][2]){
+                        if(creep.room.terminal.store[transfer[i][0]] >= transfer[i][2]){ 
                             creep.memory.mineral = transfer[i][0];
                             creep.memory.quantity = transfer[i][2];
                             creep.memory.labNum = i;
@@ -5265,10 +5280,10 @@ var rT = {
             const result = actions_1.charge(creep, target, false);
             if(result === 1 || !rT.needsEnergy(target)){//successful deposit
                 const extra = creep.store[RESOURCE_ENERGY] - target.store.getFreeCapacity(RESOURCE_ENERGY);
-
+                
                 if (extra >= 0 || target.store.getUsedCapacity(RESOURCE_ENERGY) >= 10000) {
                     //make sure to remove current target from search list
-                    const newTarget = rT.findTarget(creep, target);
+                    const newTarget = rT.findTarget(creep, target); 
                     //if creep still has energy, start moving to next target
                     if (extra > 0) {
                         rT.moveToTargetIfPresent(creep, newTarget);
@@ -5292,7 +5307,7 @@ var rT = {
             motion.newMove(creep, target.pos, 1, true, boundingBox);
         }
     },
-
+ 
     findTarget: function(creep, oldTarget){
         const ccache = utils.getCreepCache(creep.name);
         if (ccache.target && !oldTarget) {
@@ -5436,7 +5451,7 @@ var rM = {
             rM.nextSource(creep);
         } else if (!Game.getObjectById(creep.memory.source)){
             motion.newMove(creep, new RoomPosition(25, 25, creep.memory.sourceRoom), 10);
-            creep.moveTo(new RoomPosition(25, 25, creep.memory.sourceRoom), {reusePath: 50});
+            creep.moveTo(new RoomPosition(25, 25, creep.memory.sourceRoom), {reusePath: 50}); 
         } else {
             if (creep.saying != "*"){
                 rM.harvestTarget(creep);
@@ -5495,7 +5510,7 @@ var rM = {
         const sourceMap = Game.spawns[city].memory.sources || {};
         var sources = Object.keys(sourceMap);
         var openSources = _.filter(sources, Id => !occupied.includes(Id));
-
+        
         if (openSources.length){
             creep.memory.source = openSources[0];
             creep.memory.sourceRoom = Game.spawns[city].memory.sources[openSources[0]].roomName;
@@ -5561,17 +5576,17 @@ var rRo = {
         } else {
             actions_1.charge(creep, Game.spawns[creep.memory.city].room.storage);
         }
-    }
+    }  
 };
 var robber = rRo;
 
 var rS = {
     name: "scout",
     type: "scout",
-
+   
     run: function(creep) {
         const targetRoom = Memory.creeps[creep.name].targetRoom;
-        if(!targetRoom || creep.room.name == targetRoom
+        if(!targetRoom || creep.room.name == targetRoom 
             || (Cache.roomData && Cache.roomData[targetRoom] && Cache.roomData[targetRoom].scoutTime > Game.time))
             rS.getNextTarget(creep);
         if(Memory.creeps[creep.name].targetRoom)
@@ -5609,7 +5624,7 @@ var rr = {
 
 var roles = rr;
 
-function getRecipe(type, energyAvailable, room, boosted){
+function getRecipe(type, energyAvailable, room, boosted, flagName){
     const energy = energyAvailable || 0;
     const d = {};
     const rcl = room.controller.level;
@@ -5644,7 +5659,7 @@ function getRecipe(type, energyAvailable, room, boosted){
         break
     case 5:
         //lvl 5 recipes
-        d["robber"] = body([15, 15], [CARRY, MOVE]);
+        d["robber"] = body([15, 15], [CARRY, MOVE]); 
         break
     case 6:
         // lvl 6 recipes
@@ -5668,7 +5683,7 @@ function getRecipe(type, energyAvailable, room, boosted){
     d.erunner = body([2, 1], [CARRY, MOVE]);
     d.claimer = body([5, 1], [MOVE, CLAIM]);
     if (type === "depositMiner"){
-        const dMinerCounts = dMinerCalc(room, boosted);
+        const dMinerCounts = dMinerCalc(room, boosted, flagName);
         d["depositMiner"] = body(dMinerCounts, [WORK, CARRY, MOVE]);
     }
     if (d[type] == null) {
@@ -5690,23 +5705,22 @@ function cost(recipe){
 function store(recipe){
     return _.filter(recipe, part => part == CARRY).length * CARRY_CAPACITY
 }
-function dMinerCalc(room, boosted){
+function dMinerCalc(room, boosted, flagName){
     const city = room.memory.city;
     const spawn = Game.spawns[city];
     const baseBody = [1, 1, 1];
-    const flagName = city + "deposit";
     const flag = Memory.flags[flagName];
     if(!flag){
         return baseBody
     }
-    let harvested = spawn.memory.deposit;
+    let harvested = flag.harvested;
     if(!harvested){
         harvested = 0;
     }
     //distance calculated using method of travel for consistency
     const distance = motion.getRoute(spawn.pos.roomName, flag.roomName, true).length * 50;
     const workTime = CREEP_LIFE_TIME - (distance * 3);//distance x 3 since it'll take 2x as long on return
-
+    
     const result = depositMinerBody(workTime, harvested, boosted, baseBody);
     if (_.isEqual(result, baseBody)) {
         delete Memory.flags[flagName];
@@ -5742,7 +5756,7 @@ function depositMinerBody(workTime, harvested, boosted, baseBody) {
 
 function getCarriesFromWorks(works, workTime, alreadyHarvested, boosted) {
     const workPower = getWorkPower(works, boosted);
-    const carryAmount =
+    const carryAmount = 
         getHarvestResults(workPower, workTime, alreadyHarvested) - alreadyHarvested;
     return getCarriesNeeded(carryAmount, boosted)
 }
@@ -5788,7 +5802,7 @@ function minerBody(energyAvailable, rcl) {
     const energyAfterWorks = energyAvailable - works * BODYPART_COST[WORK];
     const moves = Math.floor(Math.min(Math.ceil(works / 2), Math.max(1, energyAfterWorks / BODYPART_COST[MOVE])));
     const energyAfterMoves = energyAfterWorks - moves * BODYPART_COST[MOVE];
-
+    
     // Figure out how many carries we can afford/will fill the link in fewest ticks
     const carriesPerLinkFill = Game.cpu.bucket < 9500 ? Math.ceil(LINK_CAPACITY / CARRY_CAPACITY) : Math.ceil(LINK_CAPACITY / CARRY_CAPACITY)/2;
     const loadsNeeded = (c => c <= 0 ? Infinity : Math.ceil(carriesPerLinkFill / c));
@@ -5803,7 +5817,7 @@ function minerBody(energyAvailable, rcl) {
 function upgraderBody(energyAvailable, rcl, room) {
     const controller = room.controller;
     const isBoosted = controller.effects && controller.effects.length > 0;
-    const boost = isBoosted ?
+    const boost = isBoosted ? 
         POWER_INFO[PWR_OPERATE_CONTROLLER].effect[controller.effects[0].level - 1] : 0;
     const maxWorks = CONTROLLER_MAX_UPGRADE_PER_TICK + boost;
     const types = [WORK, CARRY, MOVE];
@@ -5876,9 +5890,7 @@ function defenderBody(energyAvailable, rcl, boosted) {
             return body([6, 22, 10, 12], [TOUGH, RANGED_ATTACK, MOVE, HEAL])
         }
         if(rcl == 7){
-            const ratio = [1, 9, 3, 2];
-            const types = [TOUGH, RANGED_ATTACK, MOVE, HEAL];
-            return scalingBody(ratio, types, energyAvailable)
+            return scalingBody([1, 9, 3, 2], [TOUGH, RANGED_ATTACK, MOVE, HEAL], energyAvailable)
         }
     }
     const ratio = [3, 4, 1];
@@ -5891,8 +5903,11 @@ function defenderBody(energyAvailable, rcl, boosted) {
 }
 
 function harasserBody(energyAvailable, boosted, rcl){
-    if(boosted && rcl == 8){
-        return body([3, 31, 10, 6], [TOUGH, RANGED_ATTACK, MOVE, HEAL])
+    if(boosted){
+        if(rcl == 8)
+            return body([3, 31, 10, 6], [TOUGH, RANGED_ATTACK, MOVE, HEAL])
+        if(rcl == 7)
+            return scalingBody([1, 9, 3, 2], [TOUGH, RANGED_ATTACK, MOVE, HEAL], energyAvailable)
     }
     return scalingBody([4, 5, 1], [RANGED_ATTACK, MOVE, HEAL], energyAvailable)
 }
@@ -5946,15 +5961,15 @@ var labs = {
     //  [positive integer]: fill with integer * 1000 resource
     //  -1: empty
 
-    /* Example:
+    /* Example: 
     labInfo:
         boost: [RESOURCE_CONSTANT]
         reactors:
-            0:
+            0: 
                 id: reactorId
                 mineral: [RESOURCE_CONSTANT]
                 fill: 0
-            1:
+            1: 
                 id: reactorId
                 mineral: [RESOURCE_CONSTANT]
                 fill: 0
@@ -6160,16 +6175,16 @@ var error = {
 
 var error_1 = error;
 
-function makeCreeps(role, city, unhealthyStore, creepWantsBoosts) {
+function makeCreeps(role, city, unhealthyStore, creepWantsBoosts, flag = null) {
     const room = Game.spawns[city].room;
-
+   
     var energyToSpend = unhealthyStore ? room.energyAvailable :
         room.energyCapacityAvailable;
 
     const weHaveBoosts = utils.boostsAvailable(role);
     const boosted = creepWantsBoosts && weHaveBoosts;
 
-    const recipe = types.getRecipe(role.type, energyToSpend, room, boosted);
+    const recipe = types.getRecipe(role.type, energyToSpend, room, boosted, flag);
     const spawns = room.find(FIND_MY_SPAWNS);
     if(!Memory.counter){
         Memory.counter = 0;
@@ -6193,6 +6208,7 @@ function makeCreeps(role, city, unhealthyStore, creepWantsBoosts) {
     Game.creeps[name].memory.target = role.target;
     Game.creeps[name].memory.city = city;
     Game.creeps[name].memory.needBoost = boosted;
+    Game.creeps[name].memory.flag = flag;
     return true
 }
 
@@ -6221,20 +6237,20 @@ function runCity(city, creeps){
         const queueCount = queuedCounts[role.name] || 0;
         counts[role.name] = liveCount + queueCount;
     });
-
+    
     let usedQueue = true;
     const nextRoleInfo = spawnQueue.peekNextRole(spawn) || {};
     const spawnQueueRoleName = nextRoleInfo.role;
     let nextRole = spawnQueueRoleName ? nameToRole[spawnQueueRoleName][0] : undefined;
 
     if (!nextRole) {
-        nextRole = _.find(roles$1, role => (typeof counts[role.name] == "undefined" &&
+        nextRole = _.find(roles$1, role => (typeof counts[role.name] == "undefined" && 
         spawn.memory[role.name]) || (counts[role.name] < spawn.memory[role.name]));
         usedQueue = false;
     }
-
+    
     if (nextRole) {
-        if(makeCreeps(nextRole, city, unhealthyStore, nextRoleInfo.boosted) && usedQueue){
+        if(makeCreeps(nextRole, city, unhealthyStore, nextRoleInfo.boosted, nextRoleInfo.flag) && usedQueue){
             spawnQueue.removeNextRole(spawn);
         }
     }
@@ -6243,7 +6259,7 @@ function runCity(city, creeps){
     _.forEach(creeps, (creep) => {
         nameToRole[creep.memory.role][0].run(creep);
     });
-
+    
     link_1.run(room);
 
     //run powerSpawn
@@ -6261,7 +6277,7 @@ function updateCountsCity(city, creeps, rooms, claimRoom, unclaimRoom) {
     const controller = spawn.room.controller;
     const rcl = controller.level;
     const rcl8 = rcl > 7;
-    const emergencyTime = spawn.room.storage && spawn.room.storage.store.energy < 5000 && rcl > 4 ||
+    const emergencyTime = spawn.room.storage && spawn.room.storage.store.energy < 5000 && rcl > 4 || 
                 (rcl > 6 && !spawn.room.storage);
     const logisticsTime = rcl8 && !emergencyTime ? 500 : 50;
 
@@ -6278,7 +6294,7 @@ function updateCountsCity(city, creeps, rooms, claimRoom, unclaimRoom) {
         updateFerry(spawn, memory, rcl);
         updateMiner(rooms, rcl8, memory, spawn);
         updateBuilder(rcl, memory, spawn);
-
+    
         if (Game.time % 500 === 0) {
             runNuker(city);
             checkLabs(city);
@@ -6289,7 +6305,7 @@ function updateCountsCity(city, creeps, rooms, claimRoom, unclaimRoom) {
             updatePowerSpawn(city, memory);
             updateStorageLink(spawn, memory, structures);
         }
-        makeEmergencyCreeps(extensions, creeps, city, rcl8, emergencyTime);
+        makeEmergencyCreeps(extensions, creeps, city, rcl8, emergencyTime); 
     }
 }
 
@@ -6338,10 +6354,10 @@ function runTowers(city){
         }
         var towers = _.filter(Game.structures, (structure) => structure.structureType == STRUCTURE_TOWER && structure.room.memory.city == city);
         var hostileCreep = spawn.room.find(FIND_HOSTILE_CREEPS);
-        var injuredCreep = spawn.room.find(FIND_MY_CREEPS, {filter: (injured) => {
+        var injuredCreep = spawn.room.find(FIND_MY_CREEPS, {filter: (injured) => { 
             return (injured) && injured.hits < injured.hitsMax
         }});
-        var injuredPower = spawn.room.find(FIND_MY_POWER_CREEPS, {filter: (injured) => {
+        var injuredPower = spawn.room.find(FIND_MY_POWER_CREEPS, {filter: (injured) => { 
             return (injured) && injured.hits < injured.hitsMax
         }});
         var hostilePower = spawn.room.find(FIND_HOSTILE_POWER_CREEPS);
@@ -6369,7 +6385,7 @@ function runTowers(city){
         if(hostiles.length > 0  && !lowEnergy){
             Log.info("Towers up in " + city);
             spawn.memory.towersActive = true;
-            //identify target
+            //identify target 
             target = tower.chooseTarget(towers, hostiles, spawn.pos.roomName);
         } else {
             spawn.memory.towersActive = false;
@@ -6390,7 +6406,7 @@ function runTowers(city){
                 const repStrength = TOWER_POWER_REPAIR - (damage_distance - TOWER_OPTIMAL_RANGE) * step_size;
                 if(repStrength <= repair){
                     towers[i].repair(damaged);
-                    repair -= repStrength;
+                    repair -= repStrength; 
                 }
             }
         }
@@ -6405,8 +6421,8 @@ function maybeSafeMode(city, hostiles){
     const minY = plan.y - template.wallDistance;
     const maxX = plan.x + template.dimensions.x + template.wallDistance - 1;
     const maxY = plan.y + template.dimensions.y + template.wallDistance - 1;
-    if(_.find(hostiles, h => h.pos.x > minX
-            && h.pos.x < maxX
+    if(_.find(hostiles, h => h.pos.x > minX 
+            && h.pos.x < maxX 
             && h.pos.y > minY
             && h.pos.y < maxY)
         && room.controller.safeModeAvailable
@@ -6494,7 +6510,7 @@ function checkLabs(city){
     const plan = spawn.room.memory.plan;
     for(let i = 0; i < unassignedLabs.length; i++){
         const templatePos = {"x": unassignedLabs[i].pos.x + template.offset.x - plan.x, "y": unassignedLabs[i].pos.y + template.offset.y - plan.y};
-        if((templatePos.x == template.buildings.lab.pos[0].x && templatePos.y == template.buildings.lab.pos[0].y)
+        if((templatePos.x == template.buildings.lab.pos[0].x && templatePos.y == template.buildings.lab.pos[0].y) 
             ||(templatePos.x == template.buildings.lab.pos[1].x && templatePos.y == template.buildings.lab.pos[1].y)){
             //lab is a reactor
             spawn.memory.ferryInfo.labInfo.reactors[unassignedLabs[i].id] = {};
@@ -6511,7 +6527,7 @@ function updateMilitary(city, memory, rooms, spawn, creeps) {
     for (var i = 0; i < flags.length; i++) {
         const flagName = city + flags[i];
         const role = roles[i];
-        updateHighwayCreep(Memory.flags[flagName], spawn, creeps, role);
+        updateHighwayCreep(flagName, spawn, creeps, role);
     }
 }
 
@@ -6604,7 +6620,7 @@ function cityFraction(cityName) {
     return _.indexOf(myCities, cityName) / myCities.length
 }
 
-function updateMiner(rooms, rcl8, memory, spawn){
+function updateMiner(rooms, rcl8, memory, spawn){        
     if(rcl8){
         const bucketThreshold = settings_1.bucket.energyMining + settings_1.bucket.range * cityFraction(spawn.room.name);
         if (Game.cpu.bucket < bucketThreshold) {
@@ -6678,7 +6694,7 @@ function updateUpgrader(city, controller, memory, rcl8, creeps, rcl) {
     if (rcl8){
         const bucketThreshold = settings_1.bucket.upgrade + settings_1.bucket.range * cityFraction(room.name);
         const haveEnoughCpu = Game.cpu.bucket > bucketThreshold;
-        if (controller.ticksToDowngrade < 100000
+        if (controller.ticksToDowngrade < 100000 
             || (controller.room.storage.store.energy > settings_1.energy.rcl8upgrade && haveEnoughCpu)){
             scheduleIfNeeded(upgrader.name, 1, true, Game.spawns[city], creeps);
         }
@@ -6712,7 +6728,7 @@ function updateBuilder(rcl, memory, spawn) {
     const constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES);
     let totalSites;
     if (rcl < 4) {
-        const repairSites = _.filter(room.find(FIND_STRUCTURES), structure => (structure.hits < (structure.hitsMax*0.3))
+        const repairSites = _.filter(room.find(FIND_STRUCTURES), structure => (structure.hits < (structure.hitsMax*0.3)) 
             && (structure.structureType != STRUCTURE_WALL));
         totalSites = (Math.floor((repairSites.length)/10) + constructionSites.length);
     } else {
@@ -6728,8 +6744,8 @@ function updateBuilder(rcl, memory, spawn) {
         memory[builder.name] = 0;
     }
     if(rcl >= 4 && Game.cpu.bucket > settings_1.bucket.repair + settings_1.bucket.range * cityFraction(room.name) && spawn.room.storage && spawn.room.storage.store[RESOURCE_ENERGY] > settings_1.energy.repair){
-        const walls = _.filter(spawn.room.find(FIND_STRUCTURES),
-            struct => [STRUCTURE_RAMPART, STRUCTURE_WALL].includes(struct.structureType)
+        const walls = _.filter(spawn.room.find(FIND_STRUCTURES), 
+            struct => [STRUCTURE_RAMPART, STRUCTURE_WALL].includes(struct.structureType) 
             && !utils.isNukeRampart(struct.pos));
         if(walls.length){//find lowest hits wall
             const minHits = _.min(walls, wall => wall.hits).hits;
@@ -6808,17 +6824,20 @@ function updateStorageLink(spawn, memory, structures) {
     }
 }
 
-function updateHighwayCreep(flag, spawn, creeps, role) {
-    if (!flag) return
-    scheduleIfNeeded(role, 1, role != harasser.name, spawn, creeps);
+function updateHighwayCreep(flagName, spawn, creeps, role) {
+    const flagNames = _.filter(Object.keys(Memory.flags), flag => flag.includes(flagName));
+    for(const flag of flagNames){
+        scheduleIfNeeded(role, 1, role != harasser.name, spawn, creeps, flag);
+    }
 }
 
-function scheduleIfNeeded(role, count, boosted, spawn, currentCreeps) {
+function scheduleIfNeeded(role, count, boosted, spawn, currentCreeps, flag = null) {
     const creepsInField = getCreepsByRole(currentCreeps, role);
-    const queued = spawnQueue.getCounts(spawn)[role] || 0;
-    let creepsNeeded = count - queued - creepsInField.length;
+    const creepsOnOperation = _.filter(creepsInField, creep => creep.memory.flag == flag).length;
+    const queued = spawnQueue.countByInfo(spawn, role, flag);
+    let creepsNeeded = count - queued - creepsOnOperation;
     while (creepsNeeded > 0) {
-        spawnQueue.schedule(spawn, role, boosted);
+        spawnQueue.schedule(spawn, role, boosted, flag);
         if(role == powerMiner.name){
             spawnQueue.schedule(spawn, medic.name);
         }
@@ -6895,12 +6914,12 @@ var markets = {
                     city.terminal.send(comSend[0], comSend[1], comSend[2]);
                     Memory.rooms[city.name].termUsed = true;
                 }
-
+                
                 memory.ferryInfo.comSend = _.drop(memory.ferryInfo.comSend);
             }
         }
     },
-
+    
     distributeEnergy: function(myCities){
         var receiver = null;
         var needEnergy = _.filter(myCities, city => city.storage && city.storage.store.energy < settings_1.energy.processPower - 250000 && city.terminal);
@@ -6962,7 +6981,7 @@ var markets = {
             }
         }
     },
-
+    
     distributeMinerals: function(myCities){
         let senders = myCities;
         for (const myCity of myCities){
@@ -6984,14 +7003,14 @@ var markets = {
                         Game.spawns[city].memory.ferryInfo.mineralRequest = null;
                         break
                     }
-
+                    
                 }
                 if(x === senders.length && !Memory.rooms[myCity.name].termUsed){
                     const amount = 3000;
                     const goodPrice = PServ ? markets.getPrice(mineral) * 2 : markets.getPrice(mineral) * 1.2;
-                    const sellOrders = markets.sortOrder(Game.market.getAllOrders(order => order.type == ORDER_SELL
-                        && order.resourceType == mineral
-                        && order.amount >= amount
+                    const sellOrders = markets.sortOrder(Game.market.getAllOrders(order => order.type == ORDER_SELL 
+                        && order.resourceType == mineral 
+                        && order.amount >= amount 
                         && (order.price < goodPrice || goodPrice == 0.002)));
                     if (sellOrders.length && sellOrders[0].price * amount <= Game.market.credits){
                         Game.market.deal(sellOrders[0].id, amount, myCity.name);
@@ -7088,16 +7107,16 @@ var markets = {
         //const sellOrders = _.groupBy(_.filter(orders, order => order.type == ORDER_SELL), order => order.resourceType)
         const energyOrders = markets.sortOrder(buyOrders[RESOURCE_ENERGY]).reverse();
         const highEnergyOrder = energyOrders[0];
-
+        
         // resources we care about
         const baseMins = [RESOURCE_HYDROGEN, RESOURCE_OXYGEN, RESOURCE_UTRIUM, RESOURCE_LEMERGIUM, RESOURCE_KEANIUM, RESOURCE_ZYNTHIUM, RESOURCE_CATALYST];
-        const bars = [RESOURCE_UTRIUM_BAR, RESOURCE_LEMERGIUM_BAR, RESOURCE_ZYNTHIUM_BAR, RESOURCE_KEANIUM_BAR, RESOURCE_GHODIUM_MELT,
+        const bars = [RESOURCE_UTRIUM_BAR, RESOURCE_LEMERGIUM_BAR, RESOURCE_ZYNTHIUM_BAR, RESOURCE_KEANIUM_BAR, RESOURCE_GHODIUM_MELT, 
             RESOURCE_OXIDANT, RESOURCE_REDUCTANT, RESOURCE_PURIFIER, RESOURCE_CELL, RESOURCE_WIRE, RESOURCE_ALLOY, RESOURCE_CONDENSATE];
         const highTier = [RESOURCE_ORGANISM, RESOURCE_MACHINE, RESOURCE_DEVICE, RESOURCE_ESSENCE, PIXEL];
-
+        
         markets.updateSellPoint(highTier, termCities, buyOrders);
-        markets.sellPixels(buyOrders)
-
+        //markets.sellPixels(buyOrders)
+        
         for (const city of termCities) {
             //if no terminal continue or no spawn
             if(!city.terminal || !Game.spawns[city.memory.city].memory.ferryInfo){
@@ -7161,7 +7180,7 @@ var markets = {
             Memory.sellPoint[resources[i]] = Memory.sellPoint[resources[i]] * (1 - (Math.pow(store, 2)/ 100000000));//100 million (subject to change)
         }
     },
-
+    
     sellPower: function(city, buyOrders){
         const terminal = city.terminal;
         if ("power" in terminal.store && terminal.store["power"] > 10000){
@@ -7182,7 +7201,7 @@ var markets = {
                         resourceType: "power",
                         price: sellPrice,
                         totalAmount: 2000,
-                        roomName: city.name
+                        roomName: city.name   
                     });
                 }
             }
@@ -7210,7 +7229,7 @@ var markets = {
                         resourceType: RESOURCE_OPS,
                         price: sellPrice,
                         totalAmount: 5000,
-                        roomName: city.name
+                        roomName: city.name   
                     });
                 }
             }
@@ -7238,10 +7257,10 @@ var markets = {
                         resourceType: minerals[i],
                         price: buyPrice,
                         totalAmount: amountNeeded,
-                        roomName: city.name
+                        roomName: city.name   
                     });
                 } else if(amountNeeded === 8000 || Game.time % 400 === 30){//order already exists for max amount and has not been satisfied
-                    //increment price if price is not above market value
+                    //increment price if price is not above market value 
                     const buyPrice = markets.getPrice(minerals[i]) * 2;
                     if(order.price < buyPrice){
                         Game.market.changeOrderPrice(orderId, (Math.max(order.price*1.04, order.price + .001)));
@@ -7288,7 +7307,7 @@ var markets = {
                     resourceType: RESOURCE_ENERGY,
                     price: buyPrice,
                     totalAmount: 50000,
-                    roomName: city.name
+                    roomName: city.name   
                 });
             } else {//update order occasionally
                 if(order.price <= highPrice){
@@ -7380,10 +7399,10 @@ var markets = {
                     resourceType: boost,
                     price: buyPrice,
                     totalAmount: amountNeeded,
-                    roomName: city.name
+                    roomName: city.name   
                 });
             } else if(Game.time % 800 === 30){//order already exists for max amount and has not been satisfied
-                //increment price if price is not above market value
+                //increment price if price is not above market value 
                 const buyPrice = Math.min(markets.getPrice(boost) * 2, settings_1.upgradeBoostPrice);
                 if(order.price < buyPrice){
                     Game.market.changeOrderPrice(orderId, (Math.max(order.price*1.04, order.price + .001)));
@@ -7395,7 +7414,7 @@ var markets = {
     //////////////// MARKET UTILS ////////////////////
     // Sort orders from low to high
     sortOrder: function(orders) {
-        const sortedOrders = _.sortBy(orders, order => order.price);
+        const sortedOrders = _.sortBy(orders, order => order.price); 
         return sortedOrders
     },
 
@@ -7792,38 +7811,37 @@ var statsLib = {
         if (Game.time % settings_1.statTime == 1){
             RawMemory.setActiveSegments([]);
             const stats = {};
-            stats["game.time"] = Game.time;
             stats["cpu.getUsed"] = Game.cpu.getUsed();
             stats["cpu.bucket"] = Game.cpu.bucket;
             stats["gcl.progress"] = Game.gcl.progress;
             stats["gcl.progressTotal"] = Game.gcl.progressTotal;
             stats["gcl.level"] = Game.gcl.level;
-            stats["gcl.total"] =
+            stats["gcl.total"] = 
                 GCL_MULTIPLY * Math.pow(Game.gcl.level, GCL_POW) + Game.gcl.progress;
             stats["gpl.progress"] = Game.gpl.progress;
             stats["gpl.progressTotal"] = Game.gpl.progressTotal;
             stats["gpl.level"] = Game.gpl.level;
-            stats["gpl.total"] =
+            stats["gpl.total"] = 
                 POWER_LEVEL_MULTIPLY * Math.pow(Game.gpl.level, POWER_LEVEL_POW) + Game.gpl.progress;
             stats["energy"] = utils.getDropTotals();
 
             const heapStats = Game.cpu.getHeapStatistics();
             stats["heap.available"] = heapStats["total_available_size"];
-
+            
             var cities = [];
             _.forEach(Object.keys(Game.rooms), function(roomName){
                 const room = Game.rooms[roomName];
                 const city = Game.rooms[roomName].memory.city;
                 cities.push(city);
-
+        
                 if(room.controller && room.controller.my){
                     stats["cities." + city + ".rcl.level"] = room.controller.level;
                     stats["cities." + city + ".rcl.progress"] = room.controller.progress;
                     stats["cities." + city + ".rcl.progressTotal"] = room.controller.progressTotal;
-
+        
                     stats["cities." + city + ".spawn.energy"] = room.energyAvailable;
                     stats["cities." + city + ".spawn.energyTotal"] = room.energyCapacityAvailable;
-
+        
                     if(room.storage){
                         stats["cities." + city + ".storage.energy"] = room.storage.store.energy;
                     }
@@ -7831,9 +7849,9 @@ var statsLib = {
 
                     // Record construction progress in the city
                     const sites = room.find(FIND_CONSTRUCTION_SITES);
-                    stats[`cities.${city}.sites.progress`] =
+                    stats[`cities.${city}.sites.progress`] = 
                         _.reduce(sites, (sum, site) => sum + site.progress, 0);
-                    stats[`cities.${city}.sites.progressTotal`] =
+                    stats[`cities.${city}.sites.progressTotal`] = 
                         _.reduce(sites, (sum, site) => sum + site.progressTotal, 0);
 
                     // observer scans
@@ -7878,7 +7896,7 @@ var statsLib = {
                 }
                 stats["cities." + city + ".deposits"] = 0;
                 stats["cities." + city + ".minerals"] = 0;
-
+                
                 const spawn = Game.spawns[city];
                 if(spawn){
                     // Record the weakest wall in each city
@@ -7934,7 +7952,7 @@ var statsLib = {
             }
 
             RawMemory.segments[0] = JSON.stringify(stats);
-        }
+        }  
     }
 };
 
@@ -8088,11 +8106,12 @@ const p = {
         if(Game.cpu.bucket != 10000 || Memory.flags["claim"] || Game.shard.name.includes("shard")) return
         const myCities = utils.getMyCities();
         if(Game.gcl.level == myCities.length) return
-        const candidates = _.reject(Cache.roomData, room => !room.score
-            || room.score == -1
-            || room.rcl
-            || room.scoutTime < Game.time + CREEP_LIFE_TIME
-            || (room.claimBlock && room.claimBlock > Game.time));
+        const candidates = _.reject(Cache.roomData, room => !room.score 
+            || room.score == -1 
+            || room.rcl 
+            || room.scoutTime < Game.time + CREEP_LIFE_TIME 
+            || (room.claimBlock && room.claimBlock > Game.time)
+            || (room.safeModeCooldown && room.safeModeCooldown > Game.time + CREEP_LIFE_TIME));
         if(!candidates.length) return
         console.log("attempting expansion");
         const expoRoom = _.max(candidates, room => room.score);
@@ -8119,7 +8138,7 @@ const p = {
 
         // 1. for rooms I own. If room has a spawn or a plan, ignore. otherwise plan.
         // 2. if bucket is less than 3k, return
-        //
+        // 
 
     },
 
@@ -8137,7 +8156,7 @@ const p = {
                 room.memory.plan.y = spawnPos.y + template.offset.y - template.buildings.spawn.pos[0].y;
             }
             const planFlag = Memory.flags.plan;
-            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == settings_1.username){
+            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == "Yoner"){
                 room.memory.plan = {};
                 room.memory.plan.x = planFlag.x;
                 room.memory.plan.y = planFlag.y;
@@ -8149,7 +8168,7 @@ const p = {
                 var spawnCount = 0;
                 _.forEach(template.buildings, function(locations, structureType) {
                     locations.pos.forEach(location => {
-                        var pos = {"x": plan.x + location.x - template.offset.x,
+                        var pos = {"x": plan.x + location.x - template.offset.x, 
                             "y": plan.y + location.y - template.offset.y};
                         var name = roomName + spawnCount;
                         spawnCount = structureType == STRUCTURE_SPAWN ? spawnCount + 1 : spawnCount;
@@ -8195,10 +8214,10 @@ const p = {
                 struct.structure.destroy();
             }
         }
-        if (look.length == 1 && look[0].terrain != "wall") {
-            //Log.info("hi")
-            room.createConstructionSite(pos.x, pos.y, structureType, name);
-        }
+        const terrain = _.find(look, item => item.type == "terrain");
+        if (terrain & TERRAIN_MASK_WALL || _.find(look, item => item.type == "structure")) 
+            return
+        room.createConstructionSite(pos.x, pos.y, structureType, name);
     },
 
     buildExtractor: function(room) {
@@ -8219,7 +8238,7 @@ const p = {
     buildWalls: function(room, plan){
         //first identify all locations to be walled, if there is a road there,
         //place a rampart instead. if there is a terrain wall don't make anything
-        const startX = plan.x - template.wallDistance;
+        const startX = plan.x - template.wallDistance; 
         const startY = plan.y - template.wallDistance;
         const wallSpots = [];
         for(let i = startX; i < startX + template.dimensions.x + (template.wallDistance * 2); i++){
@@ -8240,7 +8259,7 @@ const p = {
                 if(startX + template.dimensions.x + (template.wallDistance * 2) - 1 > 0 && startX + template.dimensions.x + (template.wallDistance * 2) - 1 < 49){
                     wallSpots.push(new RoomPosition(startX + template.dimensions.x + (template.wallDistance * 2) - 1, i, room.name));
                 }
-            }
+            }  
         }
         const terrain = new Room.Terrain(room.name);
 
@@ -8366,7 +8385,7 @@ const p = {
     },
 
     tooCloseToSource: function(source) {
-        return source.pos.findInRange(FIND_SOURCES, 1).length > 1
+        return source.pos.findInRange(FIND_SOURCES, 3).length > 1
     },
 
     hasLink: function(pos, distance) {
@@ -8383,7 +8402,7 @@ const p = {
         const costs = new PathFinder.CostMatrix();
         _.forEach(template.buildings, function(locations, structureType) {//don't make roads anywhere that a structure needs to go
             locations.pos.forEach(location => {
-                var pos = {"x": plan.x + location.x - template.offset.x,
+                var pos = {"x": plan.x + location.x - template.offset.x, 
                     "y": plan.y + location.y - template.offset.y};
                 if(structureType !== STRUCTURE_ROAD){
                     costs.set(pos.x, pos.y, 0xff);
@@ -8418,7 +8437,7 @@ const p = {
         for (var i = 0; i < sources.length; i++) {
             const sourcePos = Game.getObjectById(sources[i]).pos;
             const sourcePath = PathFinder.search(sourcePos, exits, {
-                plainCost: 4, swampCost: 4, maxRooms: 1,
+                plainCost: 4, swampCost: 4, maxRooms: 1, 
                 roomCallback: () => roadMatrix
             });
             for(var j = 0; j < sourcePath.path.length; j++){
@@ -8431,7 +8450,7 @@ const p = {
     getMineralPath: function(room, exits, roadMatrix){
         const mineralPos = room.find(FIND_MINERALS)[0].pos;
         const mineralPath = PathFinder.search(mineralPos, exits, {
-            plainCost: 4, swampCost: 4, maxRooms: 1,
+            plainCost: 4, swampCost: 4, maxRooms: 1, 
             roomCallback: () => roadMatrix
         });
         return mineralPath.path.reverse()
@@ -8443,12 +8462,12 @@ const p = {
         const controller = _.find(structures, structure => structure.structureType === STRUCTURE_CONTROLLER);
         const controllerPos = controller.pos;
         const controllerPath = PathFinder.search(controllerPos, exits, {
-            plainCost: 4, swampCost: 4, maxRooms: 1,
+            plainCost: 4, swampCost: 4, maxRooms: 1, 
             roomCallback: () => roadMatrix
         });
         for(var i = 2; i < controllerPath.path.length; i++){// don't include first two paths (not needed)
             path.push(controllerPath.path[i]);
-        }
+        } 
         return path.reverse()
     },
 
@@ -8461,13 +8480,13 @@ const p = {
         for(const exitDirection of roomExits){
             const exitSpots = room.find(parseInt(exitDirection));
             const exitPath0 = PathFinder.search(startPos, exitSpots, {
-                plainCost: 4, swampCost: 4, maxRooms: 1,
+                plainCost: 4, swampCost: 4, maxRooms: 1, 
                 roomCallback: () => roadMatrix
             });
             const exitPoint = exitPath0.path[exitPath0.path.length - 1];
             //now path from this point to template exits
             const exitPath = PathFinder.search(exitPoint, exits, {
-                plainCost: 4, swampCost: 4, maxRooms: 1,
+                plainCost: 4, swampCost: 4, maxRooms: 1, 
                 roomCallback: () => roadMatrix
             });
             const exitPathPath = exitPath.path;
@@ -8477,7 +8496,7 @@ const p = {
                 "y": [plan.y - template.wallDistance, plan.y + template.dimensions.y + template.wallDistance - 1]
             };
             for(const pathPoint of exitPathPath){
-                if(pathPoint.x < safeZoneDimensions.x[0]
+                if(pathPoint.x < safeZoneDimensions.x[0] 
                     || pathPoint.x > safeZoneDimensions.x[1]
                     || pathPoint.y < safeZoneDimensions.y[0]
                     || pathPoint.y > safeZoneDimensions.y[1]){
@@ -8523,7 +8542,7 @@ const p = {
 
         //push all paths onto big list
         const roads = p.compileRoads(controllerPath, sourcePaths, mineralPath, exitPaths);
-
+        
         //place Csites
         let counter = 0;
         const csites = room.find(FIND_MY_CONSTRUCTION_SITES);
@@ -8558,34 +8577,34 @@ const p = {
 
     planRoom: function(roomName) {
         const ter = Game.map.getRoomTerrain(roomName);
-        const sqd = _(Array(50)).map((r, i) => {
+        const sqd = _(Array(50)).map((r, i) => { 
             return _(Array(50))
                 .map((v, j) => ter.get(i, j) == TERRAIN_MASK_WALL ? 0 : Infinity)
                 .value()
         }).value();
         const b = 4; // buffer
         const r = 50; // room size
-        const min = b;
+        const min = b; 
         const max = r - b - 1;
 
         for (let i = min; i <= max; i++) {
             for (let j = min; j <= max; j++) {
-                sqd[i][j] = Math.min(sqd[i][j], sqd[i - 1][j] + 1, sqd[i - 1][j - 1] + 1);
+                sqd[i][j] = Math.min(sqd[i][j], sqd[i - 1][j] + 1, sqd[i - 1][j - 1] + 1);     
             }
         }
-
+        
         for (let i = max; i >= min; i--) {
             for (let j = min; j <= max; j++) {
                 sqd[i][j] = Math.min(sqd[i][j], sqd[i][j - 1] + 1, sqd[i + 1][j - 1] + 1);
             }
         }
-
+        
         for (let i = max; i >= min; i--) {
             for (let j = max; j >= min; j--) {
                 sqd[i][j] = Math.min(sqd[i][j], sqd[i + 1][j] + 1, sqd[i + 1][j + 1] + 1);
             }
         }
-
+        
         for (let i = min; i <= max; i++) {
             for (let j = max; j >= min; j--) {
                 sqd[i][j] = Math.min(sqd[i][j], sqd[i][j + 1] + 1, sqd[i - 1][j + 1] + 1);
@@ -8595,7 +8614,7 @@ const p = {
         return _(sqd).find(row => _(row).find(score => score >= 7))
     },
 
-    newRoomNeeded: function() {
+    newRoomNeeded: function() {    
         return (Game.time % p.frequency === 0) &&
             (Game.gcl.level > p.roomsSelected.length) &&
             p.hasCpu() &&
@@ -8706,6 +8725,7 @@ const ob = {
             return
         }
         if(room.controller){
+            roomData.safeModeCooldown = room.controller.safeModeCooldown && (Game.time + room.controller.safeModeCooldown) || 0;
             roomData.owner = room.controller.owner && room.controller.owner.username;
             roomData.rcl = (room.controller.level) || 0;
             roomData.controllerPos = room.controller.pos;
@@ -8728,8 +8748,8 @@ const ob = {
     },
 
     getUnusedObserver: function() {
-        const obsCity = _.find(utils.getMyCities(), city => !utils.getRoomCache(city.name).scanned
-            && utils.getRoomCache(city.name).scannerTargets
+        const obsCity = _.find(utils.getMyCities(), city => !utils.getRoomCache(city.name).scanned 
+            && utils.getRoomCache(city.name).scannerTargets 
             && utils.getRoomCache(city.name).scannerTargets.length
             && _.find(city.find(FIND_MY_STRUCTURES), struct => struct.structureType == STRUCTURE_OBSERVER));
         return obsCity && _.find(obsCity.find(FIND_MY_STRUCTURES), struct => struct.structureType == STRUCTURE_OBSERVER)
@@ -8763,7 +8783,7 @@ const ob = {
         const roomDataCache = utils.getsetd(Cache, "roomData", {});
         for(const roomName of roomsToScan){
             const roomData = utils.getsetd(roomDataCache, roomName, {});
-            if(Game.map.getRoomStatus(roomName).status == "closed" || roomData.scoutTime && roomData.scoutTime > Game.time){
+            if(Game.map.getRoomStatus(roomName).status != "normal" || roomData.scoutTime && roomData.scoutTime > Game.time){
                 roomsToScan.delete(roomName);
                 continue
             }
@@ -8782,7 +8802,7 @@ const ob = {
         }
         Cache["roomsToScan"] = roomsToScan;
     },
-
+    
     observeNewRoomForMining: function(city) {
         const obs = ob.getObsForMining(city);
         if (!obs) return false
@@ -8818,7 +8838,7 @@ const ob = {
     },
 
     timeToRoomNum: function(time, city) {
-        return Math.floor(time / settings_1.observerFrequency) % Game.spawns[city].memory.powerRooms.length
+        return Math.floor(time / settings_1.observerFrequency) % Game.spawns[city].memory.powerRooms.length    
     },
 
     getObsForMining: function(city) {
@@ -9141,12 +9161,12 @@ Log.error = function(text) { console.log(`<p style="color:red">[ERROR] ${Game.ti
 
 // Function to buy sub token. Price in millions. BuyToken(3) will pay 3 million
 commonjsGlobal.BuyToken = function(price) {
-    Game.market.createOrder({
-        type: ORDER_BUY,
+    Game.market.createOrder({ 
+        type: ORDER_BUY, 
         resourceType: SUBSCRIPTION_TOKEN,
         price: price * 1e6,
         totalAmount: 1,
-        roomName: "E7S9"
+        roomName: "E11S22" 
     });
 };
 commonjsGlobal.SpawnQuad = function(city, boosted){
@@ -9207,7 +9227,7 @@ var loop = function () {
         }
         error_1.reset();
 
-        if(Game.shard.name == "shard0" && Game.cpu.bucket > 9500){
+        if(Game.shard.name == "shard2" && Game.cpu.bucket > 9500){
             Game.cpu.generatePixel();
         }
         var localRooms = utils.splitRoomsByCity(); // only used for remote mining?
@@ -9241,7 +9261,7 @@ var loop = function () {
                     continue // skip this city
                 }
                 city.runCity(city$1, localCreeps[city$1]);
-                city.updateCountsCity(city$1, localCreeps[city$1] || [], localRooms[city$1],
+                city.updateCountsCity(city$1, localCreeps[city$1] || [], localRooms[city$1], 
                     claimRoom, unclaimRoom);
                 city.runTowers(city$1);
                 // TODO: obs runs in dead cities
@@ -9252,7 +9272,7 @@ var loop = function () {
             } catch (failedCityError) {
                 error_1.reportError(failedCityError);
             }
-
+            
         }
         //run power creeps
         _.forEach(Game.powerCreeps, function(powerCreep$1) {
@@ -9304,7 +9324,7 @@ var loop = function () {
         //rp.findRooms();
         //rp.planRooms();
         if (Game.time % settings_1.roomplanTime == settings_1.roomplanOffset){
-            roomplan.buildConstructionSites();
+            roomplan.buildConstructionSites(); 
         }// TODO: this could go in run city?
 
         observer.recordRoomData();
@@ -9344,7 +9364,7 @@ var loop = function () {
         utils.silenceCreeps();
 
         stats.collectStats(myCities);
-
+        
         if (Game.time % settings_1.profileFrequency == 0) {
             Game.profiler.profile(settings_1.profileLength);
         }
