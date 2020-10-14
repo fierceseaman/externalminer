@@ -1773,7 +1773,7 @@ var rL = {
 var link_1 = rL;
 
 var sq = {
-    schedule: function(spawn, role, boosted = false, flag = null) {
+    schedule: function(spawn, role, boosted = false, flag) {
         sq.initialize(spawn);
         spawn.memory.sq.push({role: role, boosted: boosted, flag: flag});
     },
@@ -1793,7 +1793,7 @@ var sq = {
         return _.countBy(spawn.memory.sq, creep => creep.role)
     },
 
-    countByInfo: function(spawn, role, flag = null){
+    countByInfo: function(spawn, role, flag){
         sq.initialize(spawn);
         return _.filter(spawn.memory.sq, creep => creep.role == role && creep.flag == flag).length
     },
@@ -6176,7 +6176,7 @@ var error = {
 
 var error_1 = error;
 
-function makeCreeps(role, city, unhealthyStore, creepWantsBoosts, flag = null) {
+function makeCreeps(role, city, unhealthyStore, creepWantsBoosts, flag) {
     const room = Game.spawns[city].room;
 
     var energyToSpend = unhealthyStore ? room.energyAvailable :
@@ -6832,7 +6832,7 @@ function updateHighwayCreep(flagName, spawn, creeps, role) {
     }
 }
 
-function scheduleIfNeeded(role, count, boosted, spawn, currentCreeps, flag = null) {
+function scheduleIfNeeded(role, count, boosted, spawn, currentCreeps, flag) {
     const creepsInField = getCreepsByRole(currentCreeps, role);
     const creepsOnOperation = _.filter(creepsInField, creep => creep.memory.flag == flag).length;
     const queued = spawnQueue.countByInfo(spawn, role, flag);
