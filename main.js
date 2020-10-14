@@ -4316,8 +4316,8 @@ var rPM = {
         }
         const hostile = rPM.roomScan(creep);
         if(hostile && (hostile.pos.inRangeTo(medic.pos, 3) || hostile.pos.inRangeTo(creep.pos, 3))){
-            const harassFlag = creep.memory.city + "harass";
-            if(!Memory.flags[harassFlag])
+          if(!creep.memory.reinforced){
+                const harassFlag = u.generateFlagName(creep.memory.city + "harass")
                 Memory.flags[harassFlag] = new RoomPosition(25, 25, creep.room.name);
             creep.attack(hostile);
             breaker.heal(creep,medic);
@@ -4479,10 +4479,9 @@ var rDM = {
         switch(creep.memory.target){
         case 0: {
             //newly spawned or empty store
-            const flagName = creep.memory.city + "deposit";
+            const flagName = creep.memory.flag
             const flag = Memory.flags[flagName];
             if(!flag){//if there is no flag, change city.memory.depositMiner to 0, and suicide
-                Game.spawns[creep.memory.city].memory.depositMiner = 0;
                 creep.suicide();
                 return
             }
@@ -4556,10 +4555,9 @@ var rDM = {
             }
             if(cooldown > expected || dangerous){
                 //call in harasser
-                const flagName = creep.memory.city + "harass";
-                if(!Memory.flags[flagName]){
+                const flagName = u.generateFlagName(creep.memory.city + "harass")
+                if(!_.find(Memory.flags, flag => flag.roomName == creep.room.name))
                     Memory.flags[flagName] = new RoomPosition(25, 25, creep.room.name);
-                }
             }
         }
     },
@@ -4575,11 +4573,11 @@ var rDM = {
         });
         if (ally) {
             //remove flag
+            const flag = Memory.flags[creep.memory.flag]
             const allies = _.filter(creep.room.find(FIND_HOSTILE_CREEPS), c => settings_1.allies.includes(c.owner.username));
             for(const friendly of allies){
-                if(friendly.getActiveBodyparts(WORK) > 0){
-                    const flagName = creep.memory.city + "deposit";
-                    delete Memory.flags[flagName];
+              if(friendly.getActiveBodyparts(WORK) > 0 && friendly.pos.isNearTo(flag.x, flag.y)){
+                  delete Memory.flags[creep.memory.flag]
                     creep.memory.target = 1;
                     return true
                 }
