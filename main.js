@@ -7,7 +7,7 @@ var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof win
 const username = Object.values(Game.structures).concat(Object.values(Game.creeps), Object.values(Game.powerCreeps), Object.values(Game.constructionSites))[0].owner.username;
 var settings = {
     username: "FierceSeaman",
-    allies: [""],
+    allies: ["FierceSeaman"],
     nukeStructures: [STRUCTURE_SPAWN, STRUCTURE_LAB, STRUCTURE_STORAGE, STRUCTURE_FACTORY,
         STRUCTURE_TERMINAL, STRUCTURE_POWER_SPAWN, STRUCTURE_NUKER],
     militaryBoosts:["XKHO2", "XGHO2", "XZHO2", "XLHO2", "XZH2O", "G"],
@@ -1245,7 +1245,9 @@ var m = {
                 const roomData = utils.getsetd(roomDataCache, roomName, {});
                 if(roomData.owner && !settings_1.allies.includes(roomData.owner)
                     && roomData.rcl
-                    && CONTROLLER_STRUCTURES[STRUCTURE_TOWER][roomData.rcl]){
+                    && CONTROLLER_STRUCTURES[STRUCTURE_TOWER][roomData.rcl]
+                    && (!creep.memory.tolerance
+                    || creep.memory.tolerance < CONTROLLER_STRUCTURES[STRUCTURE_TOWER][roomData.rcl] * TOWER_POWER_ATTACK - (TOWER_POWER_ATTACK * TOWER_FALLOFF))){
                     return false
                 }
                 if(roomData.skLairs && roomData.rcl) return false
