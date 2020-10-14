@@ -4330,6 +4330,7 @@ var rPM = {
         if(!canMove && !medic.pos.isNearTo(creep.pos)){
             breaker.medicMove(creep, medic);
         }
+      }
     },
 
     hitBank: function(creep, medic, bank, canMove){
