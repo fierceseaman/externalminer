@@ -8092,7 +8092,8 @@ const p = {
             || room.score == -1
             || room.rcl
             || room.scoutTime < Game.time + CREEP_LIFE_TIME
-            || (room.claimBlock && room.claimBlock > Game.time));
+            || (room.claimBlock && room.claimBlock > Game.time)
+            || (room.safeModeCooldown && room.safeModeCooldown > Game.time + CREEP_LIFE_TIME))
         if(!candidates.length) return
         console.log("attempting expansion");
         const expoRoom = _.max(candidates, room => room.score);
@@ -8706,6 +8707,7 @@ const ob = {
             return
         }
         if(room.controller){
+            roomData.safeModeCooldown = room.controller.safeModeCooldown && (Game.time + room.controller.safeModeCooldown) || 0
             roomData.owner = room.controller.owner && room.controller.owner.username;
             roomData.rcl = (room.controller.level) || 0;
             roomData.controllerPos = room.controller.pos;
