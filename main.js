@@ -562,7 +562,15 @@ var u = {
                 delete Memory.flags[flagName];
             }
         }
-    }
+      },
+
+      generateFlagName: function(baseName){
+          let counter = 0
+          while(Memory.flags[baseName + counter]){
+              counter++
+          }
+          return baseName + counter
+        }
 };
 
 var utils = u;
@@ -1783,6 +1791,11 @@ var sq = {
     getCounts: function(spawn) {
         sq.initialize(spawn);
         return _.countBy(spawn.memory.sq, creep => creep.role)
+    },
+
+    countByInfo: function(spawn, role, flag = null){
+        sq.initialize(spawn)
+        return _.filter(spawn.memory.sq, creep => creep.role == role && creep.flag == flag).length
     },
 
     respawn: function(creep, boosted) {
@@ -6161,7 +6174,7 @@ var error = {
 
 var error_1 = error;
 
-function makeCreeps(role, city, unhealthyStore, creepWantsBoosts) {
+function makeCreeps(role, city, unhealthyStore, creepWantsBoosts, flag = null) {
     const room = Game.spawns[city].room;
 
     var energyToSpend = unhealthyStore ? room.energyAvailable :
@@ -6194,6 +6207,7 @@ function makeCreeps(role, city, unhealthyStore, creepWantsBoosts) {
     Game.creeps[name].memory.target = role.target;
     Game.creeps[name].memory.city = city;
     Game.creeps[name].memory.needBoost = boosted;
+    Game.creeps[name].memory.flag = flag;
     return true
 }
 
@@ -6235,7 +6249,7 @@ function runCity(city, creeps){
     }
 
     if (nextRole) {
-        if(makeCreeps(nextRole, city, unhealthyStore, nextRoleInfo.boosted) && usedQueue){
+        if(makeCreeps(nextRole, city, unhealthyStore, nextRoleInfo.boosted, nextRoleInfo.flag) && usedQueue){
             spawnQueue.removeNextRole(spawn);
         }
     }
@@ -6512,7 +6526,7 @@ function updateMilitary(city, memory, rooms, spawn, creeps) {
     for (var i = 0; i < flags.length; i++) {
         const flagName = city + flags[i];
         const role = roles[i];
-        updateHighwayCreep(Memory.flags[flagName], spawn, creeps, role);
+        updateHighwayCreep(flagName, spawn, creeps, role);
     }
 }
 
@@ -6809,17 +6823,20 @@ function updateStorageLink(spawn, memory, structures) {
     }
 }
 
-function updateHighwayCreep(flag, spawn, creeps, role) {
-    if (!flag) return
-    scheduleIfNeeded(role, 1, role != harasser.name, spawn, creeps);
+function updateHighwayCreep(flagName, spawn, creeps, role) {
+    const flagNames = _.filter(Object.keys(Memory.flags), flag => flag.includes(flagName))
+    for(const flag of flagNames){
+        scheduleIfNeeded(role, 1, role != rH.name, spawn, creeps, Memory.flags[flag])
+    }
 }
 
-function scheduleIfNeeded(role, count, boosted, spawn, currentCreeps) {
+function scheduleIfNeeded(role, count, boosted, spawn, currentCreeps, flag = null) {
     const creepsInField = getCreepsByRole(currentCreeps, role);
-    const queued = spawnQueue.getCounts(spawn)[role] || 0;
-    let creepsNeeded = count - queued - creepsInField.length;
+    const creepsOnOperation = _.filter(creepsInField, creep => creep.memory.flag == flag).length
+    const queued = sq.countByInfo(spawn, role, flag)
+    let creepsNeeded = count - queued - creepsOnOperation
     while (creepsNeeded > 0) {
-        spawnQueue.schedule(spawn, role, boosted);
+        spawnQueue.schedule(spawn, role, boosted, flag);
         if(role == powerMiner.name){
             spawnQueue.schedule(spawn, medic.name);
         }
