@@ -3818,7 +3818,7 @@ var rR = {
                 return
             }
             //check for flag
-            const flagName = creep.memory.city + "powerMine";
+            const flagName = creep.memory.flag || creep.memory.city + "powerMine";
             const flag = Memory.flags[flagName];
             if (flag && flag.roomName !== creep.pos.roomName){
                 //move to flag range 5
@@ -4373,7 +4373,7 @@ var rPM = {
             creep.memory.bankInfo.runnersSummoned = true;
             spawnQueue.initialize(Game.spawns[creep.memory.city]);
             for(let i = 0; i < creep.memory.bankInfo.runnersNeeded; i++){
-                spawnQueue.schedule(Game.spawns[creep.memory.city], runner.name);
+                spawnQueue.schedule(Game.spawns[creep.memory.city], rR.name, false, creep.memory.flag);
             }
         }
     },
