@@ -1245,9 +1245,7 @@ var m = {
                 const roomData = utils.getsetd(roomDataCache, roomName, {});
                 if(roomData.owner && !settings_1.allies.includes(roomData.owner)
                     && roomData.rcl
-                    && CONTROLLER_STRUCTURES[STRUCTURE_TOWER][roomData.rcl]
-                    && (!creep.memory.tolerance
-                    || creep.memory.tolerance < CONTROLLER_STRUCTURES[STRUCTURE_TOWER][roomData.rcl] * TOWER_POWER_ATTACK - (TOWER_POWER_ATTACK * TOWER_FALLOFF))){
+                    && CONTROLLER_STRUCTURES[STRUCTURE_TOWER][roomData.rcl])){
                     return false
                 }
                 if(roomData.skLairs && roomData.rcl) return false
