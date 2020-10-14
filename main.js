@@ -35,7 +35,7 @@ var settings = {
         colony: 4000, // building new rooms
         upgrade: 4500,
         energyMining: 4000,
-        powerMining: 8000,
+        powerMining: 5000,
         mineralMining: 8000,
         // other constants we use with these
         range: 3000, //this keeps all power mining from shutting off at once.
