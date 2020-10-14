@@ -4519,10 +4519,10 @@ var rDM = {
                 }
                 creep.memory.mined += works;
                 // update city level tracker for planning purposes
-                if(!Game.spawns[creep.memory.city].memory.deposit){
-                    Game.spawns[creep.memory.city].memory.deposit = 0;
+                if(!Memory.flags[creep.memory.flag].harvested){
+                    Memory.flags[creep.memory.flag].harvested = 0
                 }
-                Game.spawns[creep.memory.city].memory.deposit = Game.spawns[creep.memory.city].memory.deposit + works;
+                Memory.flags[creep.memory.flag].harvested += works
             }
             break
         }
@@ -5622,7 +5622,7 @@ var rr = {
 
 var roles = rr;
 
-function getRecipe(type, energyAvailable, room, boosted){
+function getRecipe(type, energyAvailable, room, boosted, flagName){
     const energy = energyAvailable || 0;
     const d = {};
     const rcl = room.controller.level;
@@ -5681,7 +5681,7 @@ function getRecipe(type, energyAvailable, room, boosted){
     d.erunner = body([2, 1], [CARRY, MOVE]);
     d.claimer = body([5, 1], [MOVE, CLAIM]);
     if (type === "depositMiner"){
-        const dMinerCounts = dMinerCalc(room, boosted);
+        const dMinerCounts = dMinerCalc(room, boosted, flagName)
         d["depositMiner"] = body(dMinerCounts, [WORK, CARRY, MOVE]);
     }
     if (d[type] == null) {
@@ -5703,16 +5703,15 @@ function cost(recipe){
 function store(recipe){
     return _.filter(recipe, part => part == CARRY).length * CARRY_CAPACITY
 }
-function dMinerCalc(room, boosted){
+function dMinerCalc(room, boosted, flagName){
     const city = room.memory.city;
     const spawn = Game.spawns[city];
     const baseBody = [1, 1, 1];
-    const flagName = city + "deposit";
     const flag = Memory.flags[flagName];
     if(!flag){
         return baseBody
     }
-    let harvested = spawn.memory.deposit;
+    let harvested = flag.harvested;
     if(!harvested){
         harvested = 0;
     }
@@ -6183,7 +6182,7 @@ function makeCreeps(role, city, unhealthyStore, creepWantsBoosts, flag = null) {
     const weHaveBoosts = utils.boostsAvailable(role);
     const boosted = creepWantsBoosts && weHaveBoosts;
 
-    const recipe = types.getRecipe(role.type, energyToSpend, room, boosted);
+    const recipe = types.getRecipe(role.type, energyToSpend, room, boosted, flag);
     const spawns = room.find(FIND_MY_SPAWNS);
     if(!Memory.counter){
         Memory.counter = 0;
