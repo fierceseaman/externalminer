@@ -1041,7 +1041,7 @@ var m = {
     // optional bounding box of form: [top, left, bottom, right]
     newMove: function(creep, endPos,  range = 0, avoidEnemies = true, boundingBox = null){
         //check for cached path and cached route
-        const ccache = utils.getCreepCache(creep.name);
+        const ccache = utils.getCreepCache(creep.id);
         const routeVerified = m.checkRoute(creep, endPos);
         const pathVerified = m.checkPath(creep, endPos);
         //if creep thinks it moved last tick, but pos is the same, it's stuck/needs recalc
@@ -1091,7 +1091,7 @@ var m = {
 
     //bool, returns success of pathfinding ops
     getRouteAndPath: function(creep, endPos, avoidEnemies, range, boundingBox){
-        const ccache = utils.getCreepCache(creep.name);
+        const ccache = utils.getCreepCache(creep.id);
 
         //if creep is in same room as target, path to target. Otherwise, path to nearest exit in the right direction
         const sameRoom = creep.pos.roomName == endPos.roomName;
@@ -1308,7 +1308,7 @@ var m = {
                 });
                 // Avoid creeps in the room
                 room.find(FIND_CREEPS).forEach(function(c) {
-                    const ccache = utils.getCreepCache(c.name);
+                    const ccache = utils.getCreepCache(c.id);
                     if(!ccache.lastMove || ccache.lastMove < (Game.time - 1)){
                         costs.set(c.pos.x, c.pos.y, 0xff);
                     }
@@ -1385,7 +1385,7 @@ var m = {
     },
 
     checkRoute: function(creep, endPos){//verify that cached route is up to date
-        const ccache = utils.getCreepCache(creep.name);
+        const ccache = utils.getCreepCache(creep.id);
         //if creep is already in the same room as destination, route does not need to be checked
         if (ccache.route && endPos.roomName == ccache.route[ccache.route.length - 1].room){
             return true
@@ -1397,7 +1397,7 @@ var m = {
     },
 
     checkPath: function(creep, endPos){//verify that cached path is up to date
-        const ccache = utils.getCreepCache(creep.name);
+        const ccache = utils.getCreepCache(creep.id);
         //destination must match destination of cached path
         if(ccache.endPos && endPos.isEqualTo(ccache.endPos)){
             return true
@@ -5315,7 +5315,7 @@ var rT = {
     },
 
     findTarget: function(creep, oldTarget){
-        const ccache = utils.getCreepCache(creep.name);
+        const ccache = utils.getCreepCache(creep.id);
         if (ccache.target && !oldTarget) {
             const cachedTarget = Game.getObjectById(ccache.target);
             if (rT.needsEnergy(cachedTarget)) {
@@ -7803,7 +7803,7 @@ var statsLib = {
 
     collectStats: function(myCities) {
         for (const creep of Object.values(Game.creeps)) {
-            const ccache = utils.getCreepCache(creep.name);
+            const ccache = utils.getCreepCache(creep.id);
             const rcache = utils.getRoomCache(creep.room.name);
             if (utils.getsetd(ccache, "lastHits", creep.hits) > creep.hits) {
                 ccache.attacks = utils.getsetd(ccache, "attacks", 0) + 1;
@@ -7885,10 +7885,10 @@ var statsLib = {
                 }
 
                 const creeps = creepsByRole[role.name] || [];
-                const attackList = _.map(creeps, creep => utils.getCreepCache(creep.name).attacks);
+                const attackList = _.map(creeps, creep => utils.getCreepCache(creep.id).attacks);
                 stats[`creeps.${role.name}.attacks`] = _.sum(attackList);
                 for (const creep of creeps) {
-                    const ccache = utils.getCreepCache(creep.name);
+                    const ccache = utils.getCreepCache(creep.id);
                     ccache.attacks = 0;
                 }
             });
