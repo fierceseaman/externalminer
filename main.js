@@ -1243,7 +1243,7 @@ var m = {
             maxOps: 10000,
             roomCallback: function(roomName){
                 const roomData = utils.getsetd(roomDataCache, roomName, {});
-                if(roomData.owner && !settings_1.allies.includes(roomData.owner)
+                if(roomName != creep.pos.roomName && roomData.owner && !settings.allies.includes(roomData.owner)
                     && roomData.rcl
                     && CONTROLLER_STRUCTURES[STRUCTURE_TOWER][roomData.rcl]
                     && (!creep.memory.tolerance
