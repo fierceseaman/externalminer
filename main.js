@@ -7124,7 +7124,7 @@ var markets = {
         const highTier = commodityManager.getTopTier(commodityManager.groupByFactoryLevel(termCities)).concat([PIXEL]);
 
         markets.updateSellPoint(highTier, termCities, buyOrders);
-        markets.sellPixels(buyOrders)
+        //markets.sellPixels(buyOrders)
 
         for (const city of termCities) {
             //if no terminal continue or no spawn
