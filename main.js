@@ -3682,7 +3682,7 @@ var rPC = {
     },
 
     initializePowerCreep: function(creep) {
-        if(Game.shard.name != "shard3") return
+        if(Game.shard.name != "shard0") return
         if (!creep.memory.city) {
             const cities = utils.getMyCities();
             const usedRooms = _(Game.powerCreeps)
@@ -7937,6 +7937,7 @@ var statsLib = {
         if (Game.time % settings_1.statTime == 1){
             RawMemory.setActiveSegments([]);
             const stats = {};
+	    stats["game.time"] = Game.time;
             stats["cpu.getUsed"] = Game.cpu.getUsed();
             stats["cpu.bucket"] = Game.cpu.bucket;
             stats["gcl.progress"] = Game.gcl.progress;
@@ -8511,7 +8512,7 @@ const p = {
     },
 
     tooCloseToSource: function(source) {
-        return source.pos.findInRange(FIND_SOURCES, 3).length > 1
+        return source.pos.findInRange(FIND_SOURCES, 1).length > 1
     },
 
     hasLink: function(pos, distance) {
