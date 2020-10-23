@@ -9236,7 +9236,7 @@ var loop = function () {
         }
         error_1.reset();
 
-        if(Game.shard.name == "shard0" && Game.cpu.bucket > 9500){
+        if(Game.shard.name == "shard2" && Game.cpu.bucket > 9500){
             Game.cpu.generatePixel();
         }
         var localRooms = utils.splitRoomsByCity(); // only used for remote mining?
