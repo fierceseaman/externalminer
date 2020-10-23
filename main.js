@@ -7,7 +7,7 @@ var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof win
 const username = Object.values(Game.structures).concat(Object.values(Game.creeps), Object.values(Game.powerCreeps), Object.values(Game.constructionSites))[0].owner.username;
 var settings = {
     username: "FierceSeaman",
-    allies: [""],
+    allies: ["FierceSeaman"],
     nukeStructures: [STRUCTURE_SPAWN, STRUCTURE_LAB, STRUCTURE_STORAGE, STRUCTURE_FACTORY,
         STRUCTURE_TERMINAL, STRUCTURE_POWER_SPAWN, STRUCTURE_NUKER],
     militaryBoosts:["XKHO2", "XGHO2", "XZHO2", "XLHO2", "XZH2O", "G"],
@@ -8282,7 +8282,7 @@ const p = {
                 room.memory.plan.y = spawnPos.y + template.offset.y - template.buildings.spawn.pos[0].y;
             }
             const planFlag = Memory.flags.plan;
-            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == "Yoner"){
+            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == "FierceSeaman"){
                 room.memory.plan = {};
                 room.memory.plan.x = planFlag.x;
                 room.memory.plan.y = planFlag.y;
@@ -9292,7 +9292,7 @@ commonjsGlobal.BuyToken = function(price) {
         resourceType: SUBSCRIPTION_TOKEN,
         price: price * 1e6,
         totalAmount: 1,
-        roomName: "E11S22" 
+        roomName: "E7S9" 
     });
 };
 commonjsGlobal.SpawnQuad = function(city, boosted){
