@@ -9022,7 +9022,7 @@ const ob = {
 
         for (let i = 0; i < deposits.length; i++) {
             const depositFlagName = utils.generateFlagName(city + "deposit");
-            if(deposits[i].lastCooldown < 100 && !ob.checkFlags(deposits[i].pos)){
+            if(deposits[i].lastCooldown < 500 && !ob.checkFlags(deposits[i].pos)){
                 Memory.flags[depositFlagName] = deposits[i].pos;
                 Memory.flags[depositFlagName].harvested = Math.floor(Math.pow((deposits[i].lastCooldown / 0.001), 1/1.2));
             }
