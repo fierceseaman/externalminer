@@ -195,10 +195,10 @@ var u = {
     getGoodPickups: function(creep) {
         var city = creep.memory.city;
         var localCreeps = u.splitCreepsByCity();
-        var runners = _.filter(localCreeps[city], lcreep => lcreep.memory.role == "runner");
-        var drops = _.flatten(_.map(runners, runner => runner.room.find(FIND_DROPPED_RESOURCES)));
+        var miners = _.filter(localCreeps[city], lcreep => lcreep.memory.role == "remoteMiner");
+        var drops = _.flatten(_.map(miners, miner => miner.room.find(FIND_DROPPED_RESOURCES)));
         const runnersBySource = _.groupBy(_.filter(localCreeps[city]), c => c.memory.role == "runner", runner => runner.memory.targetId);
-        const containers = _.map(runners, runner => _.find(miner.pos.lookFor(LOOK_STRUCTURES), struct => struct.structureType == STRUCTURE_CONTAINER));
+        const containers = _.map(miners, miner => _.find(miner.pos.lookFor(LOOK_STRUCTURES), struct => struct.structureType == STRUCTURE_CONTAINER));
         const goodContainers = _.filter(containers,
             function(container){
                 if(!container || container.store.getUsedCapacity() <= 0.5 * creep.store.getCapacity())
