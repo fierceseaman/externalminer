@@ -5846,7 +5846,7 @@ function dMinerCalc(room, boosted, flagName){
 function depositMinerBody(workTime, harvested, boosted, baseBody) {
     let works = 20;
     let carries = getCarriesFromWorks(works, workTime, harvested, boosted);
-    if(carries < 8){// if we're getting less than 400 resource in a lifetime, drop the source
+    if(carries < 4){// if we're getting less than 400 resource in a lifetime, drop the source
         return baseBody
     }
     if(carries > 10){
