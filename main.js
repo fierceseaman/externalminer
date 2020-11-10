@@ -830,7 +830,7 @@ var cM = {
         //push all top tier resources into queue
 
         while(requestQueue.length){
-            console.log(requestQueue);
+            console.log("Request Queue is:", requestQueue);
             const requestedProduct = requestQueue.shift();
             const quantities = cM.getOrderQuantities(requestedProduct);
             const clearedToShip = cM.getOrderStatus(quantities, levelCache);
@@ -852,7 +852,7 @@ var cM = {
     getTopTier: function(citiesByFactoryLevel){
         const levels = Object.keys(citiesByFactoryLevel);
         const topTier = _.max(levels);
-        console.log(topTier);
+        console.log("Top Tier is:", topTier);
         return _.filter(Object.keys(COMMODITIES), c => COMMODITIES[c].level == topTier && cM.isCommodity(c))
     },
 
@@ -887,7 +887,7 @@ var cM = {
 
     getDestination: function(product, citiesByFactoryLevel){
         //return roomName. destination must have less than 2k of all commodities and correct factoryLevel.
-        console.log(product);
+        console.log("Product is:", product);
         const prodLvl = COMMODITIES[product].level;
         const components = _.without(Object.keys(COMMODITIES[product].components), RESOURCE_ENERGY);
         const destinations = _.filter(citiesByFactoryLevel[prodLvl], city =>
