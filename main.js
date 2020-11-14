@@ -7017,6 +7017,7 @@ var markets = {
         case 10: markets.distributePower(termCities); break
         case 20: markets.distributeUpgrade(termCities); break
         case 30: markets.buyAndSell(termCities); break
+        case 40: markets.distributeOps(termCities); break
         }
     },
 
@@ -7202,6 +7203,7 @@ var markets = {
     },
 
     distributeOps: function(myCities){
+        Log.info("Distributing OPS ");
         var receiver = null;
         var needOps = _.filter(myCities, city => city.controller.level == 8 && city.terminal && city.terminal.store[RESOURCE_OPS] < 300);
         if (needOps.length){
@@ -7210,7 +7212,7 @@ var markets = {
                 if (city.terminal && city.terminal.store[RESOURCE_OPS] > 7000 && !Memory.rooms[city.name].termUsed){
                     city.terminal.send(RESOURCE_OPS, 5000, receiver);
                     Memory.rooms[city.name].termUsed = true;
-                    Log.info("Sending power to " + receiver);
+                    Log.info("Sending OPS to " + receiver);
                     return
                 }
             }
