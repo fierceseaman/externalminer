@@ -7207,7 +7207,7 @@ var markets = {
         var receiver = null;
         var needOps = _.filter(myCities, city => city.controller.level == 8 && city.terminal && city.terminal.store[RESOURCE_OPS] < 300);
         if (needOps.length){
-            Log.info("Distributing OPS to" + needOps[0].name);
+            Log.info("Distributing OPS to " + needOps[0].name);
             receiver = needOps[0].name;
             for (const city of myCities){
                 if (city.terminal && city.terminal.store[RESOURCE_OPS] > 2000 && !Memory.rooms[city.name].termUsed){
