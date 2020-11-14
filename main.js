@@ -7209,8 +7209,8 @@ var markets = {
         if (needOps.length){
             receiver = needOps[0].name;
             for (const city of myCities){
-                if (city.terminal && city.terminal.store[RESOURCE_OPS] > 7000 && !Memory.rooms[city.name].termUsed){
-                    city.terminal.send(RESOURCE_OPS, 5000, receiver);
+                if (city.terminal && city.terminal.store[RESOURCE_OPS] > 2000 && !Memory.rooms[city.name].termUsed){
+                    city.terminal.send(RESOURCE_OPS, 1000, receiver);
                     Memory.rooms[city.name].termUsed = true;
                     Log.info("Sending OPS to " + receiver);
                     return
