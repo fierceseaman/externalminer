@@ -7,11 +7,11 @@ var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof win
 const username = Object.values(Game.structures).concat(Object.values(Game.creeps), Object.values(Game.powerCreeps), Object.values(Game.constructionSites))[0].owner.username;
 var settings = {
     username: "FierceSeaman",
-    allies: [""],
+    allies: ["FierceSeaman"],
     nukeStructures: [STRUCTURE_SPAWN, STRUCTURE_LAB, STRUCTURE_STORAGE, STRUCTURE_FACTORY,
         STRUCTURE_TERMINAL, STRUCTURE_POWER_SPAWN, STRUCTURE_NUKER],
-    militaryBoosts:["XKHO2", "XGHO2", "XZHO2", "XLHO2", "XZH2O", "G"],
-    civBoosts: ["XLH2O", "XUHO2", "XKH2O", "XUH2O", "XGH2O"],
+    militaryBoosts:["XUH2O", "XKHO2", "XGHO2", "XZHO2", "XLHO2", "XZH2O", "G"],
+    civBoosts: ["XLH2O", "XUHO2", "XKH2O", "XGH2O"],
     roomplanTime: 500,
     roomplanOffset: 155,
     cMTime: 400,
@@ -35,7 +35,7 @@ var settings = {
         colony: 4000, // building new rooms
         upgrade: 4500,
         energyMining: 4000,
-        powerMining: 8000,
+        powerMining: 5000,
         mineralMining: 8000,
         // other constants we use with these
         range: 3000, //this keeps all power mining from shutting off at once.
@@ -67,7 +67,7 @@ var settings = {
     },
     powerMiningRange: 2,
     miningRange: 7,
-    observerFrequency: 20, // how often each city scans a room
+    observerFrequency: 10, // how often each city scans a room
 
     // Profiling
     profileFrequency: 19, // profiler runs every 123 ticks
@@ -3767,7 +3767,7 @@ var rPC = {
     },
 
     initializePowerCreep: function(creep) {
-        if(Game.shard.name != "shard3") return
+        if(Game.shard.name != "shard0") return
         if (!creep.memory.city) {
             const cities = utils.getMyCities();
             const usedRooms = _(Game.powerCreeps)
@@ -6104,7 +6104,7 @@ function dMinerCalc(room, boosted, flagName){
 function depositMinerBody(workTime, harvested, boosted, baseBody) {
     let works = 20;
     let carries = getCarriesFromWorks(works, workTime, harvested, boosted);
-    if(carries < 8){// if we're getting less than 400 resource in a lifetime, drop the source
+    if(carries < 4){// if we're getting less than 400 resource in a lifetime, drop the source
         return baseBody
     }
     if(carries > 10){
@@ -7493,10 +7493,10 @@ var markets = {
         if (needOps.length){
             receiver = needOps[0].name;
             for (const city of myCities){
-                if (city.terminal && city.terminal.store[RESOURCE_OPS] > 7000 && !Memory.rooms[city.name].termUsed){
-                    city.terminal.send(RESOURCE_OPS, 5000, receiver);
+                if (city.terminal && city.terminal.store[RESOURCE_OPS] > 2000 && !Memory.rooms[city.name].termUsed){
+                    city.terminal.send(RESOURCE_OPS, 1000, receiver);
                     Memory.rooms[city.name].termUsed = true;
-                    Log.info("Sending power to " + receiver);
+                    Log.info("Sending ops to " + receiver);
                     return
                 }
             }
@@ -8223,6 +8223,7 @@ var statsLib = {
         if (Game.time % settings_1.statTime == 1){
             RawMemory.setActiveSegments([]);
             const stats = {};
+	    stats["game.time"] = Game.time;
             stats["cpu.getUsed"] = Game.cpu.getUsed();
             stats["cpu.bucket"] = Game.cpu.bucket;
             stats["gcl.progress"] = Game.gcl.progress;
@@ -8568,7 +8569,7 @@ const p = {
                 room.memory.plan.y = spawnPos.y + template.offset.y - template.buildings.spawn.pos[0].y;
             }
             const planFlag = Memory.flags.plan;
-            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == "Yoner"){
+            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == "FierceSeaman"){
                 room.memory.plan = {};
                 room.memory.plan.x = planFlag.x;
                 room.memory.plan.y = planFlag.y;
@@ -9598,7 +9599,16 @@ commonjsGlobal.BuyToken = function(price) {
         resourceType: SUBSCRIPTION_TOKEN,
         price: price * 1e6,
         totalAmount: 1,
-        roomName: "E11S22" 
+        roomName: "E7S9" 
+    });
+};
+commonjsGlobal.BuyOps = function(price, amount, city) {
+    Game.market.createOrder({
+        type: ORDER_BUY,
+        resourceType: RESOURCE_OPS,
+        price: price,
+        totalAmount: amount,
+        roomName: city
     });
 };
 commonjsGlobal.SpawnQuad = function(city, boosted){
