@@ -45,9 +45,9 @@ var settings = {
     },
     energy: {//energy thresholds
         repair: 60000,
-        rcl8upgrade: 450000,
-        processPower: 400000,
-        powerMine: 450000
+        rcl8upgrade: 350000,
+        processPower: 300000,
+        powerMine: 350000
     },
     max: {
         upgraders: 6, // low rcl
