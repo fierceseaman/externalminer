@@ -7528,7 +7528,7 @@ var markets = {
 
         markets.updateSellPoint(highTier, termCities, buyOrders);
         //markets.sellPixels(buyOrders)
-        markets.sellUnlocks(buyOrders)
+        //markets.sellUnlocks(buyOrders)
 
         for (const city of termCities) {
             //if no terminal continue or no spawn
