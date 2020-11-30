@@ -7767,13 +7767,13 @@ var markets = {
         }
     },
 
-    sellUnlocks: function(buyOrders){
-        const orders = markets.sortOrder(buyOrders[CPU_UNLOCK]).reverse();
-        if(orders.length && orders[0].price > Memory.sellPoint[CPU_UNLOCK]){
-            Game.market.deal(orders[0].id, Math.min(orders[0].remainingAmount, Game.resources[CPU_UNLOCK]));
-            Log.info("Sold unlocks for: " + orders[0].price);
-        }
-    },
+//    sellUnlocks: function(buyOrders){
+//        const orders = markets.sortOrder(buyOrders[CPU_UNLOCK]).reverse();
+//        if(orders.length && orders[0].price > Memory.sellPoint[CPU_UNLOCK]){
+//            Game.market.deal(orders[0].id, Math.min(orders[0].remainingAmount, Game.resources[CPU_UNLOCK]));
+//            Log.info("Sold unlocks for: " + orders[0].price);
+//        }
+//    },
 
     buyPower: function(city, termUsed, sellOrders) {
         if (termUsed) {
