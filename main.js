@@ -67,7 +67,7 @@ var settings = {
     },
     powerMiningRange: 2,
     miningRange: 7,
-    observerFrequency: 10, // how often each city scans a room
+    observerFrequency: 20, // how often each city scans a room
 
     // Profiling
     profileFrequency: 19, // profiler runs every 123 ticks
