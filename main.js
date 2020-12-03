@@ -4152,14 +4152,14 @@ var rBr = {
         utils.updateCheckpoints(creep);
         rBr.init(creep);
         const medic = Game.getObjectById(creep.memory.medic);
-//        if(!medic){
-//            if(rBr.endLife(creep)){
-//                return
-//            } else {
-//                rBr.medicSearch(creep);
-//                return
-//            }
-//        }
+        if(!medic){
+            if(rBr.endLife(creep)){
+                return
+            } else {
+                rBr.medicSearch(creep);
+                return
+            }
+        }
         //breaker has a medic
         const canMove = rBr.canMove(creep, medic);
         let target = Game.getObjectById(creep.memory.target);
