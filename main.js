@@ -9640,6 +9640,15 @@ commonjsGlobal.BuyToken = function(price) {
         roomName: "E7S9"
     });
 };
+commonjsGlobal.BuyOps = function(price, amount, city) {
+    Game.market.createOrder({
+        type: ORDER_BUY,
+        resourceType: RESOURCE_OPS,
+        price: price,
+        totalAmount: amount,
+        roomName: city
+    });
+};
 commonjsGlobal.SpawnQuad = function(city, boosted){
     military.spawnQuad(city, boosted);
 };
