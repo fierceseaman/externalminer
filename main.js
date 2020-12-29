@@ -7359,6 +7359,7 @@ var markets = {
                 if (city.name != target && city.storage && city.storage.store.energy > Game.rooms[target].storage.store.energy - 80000 && !Memory.rooms[city.name].termUsed){
                     city.terminal.send(RESOURCE_ENERGY, 25000, target);
                     Memory.rooms[city.name].termUsed = true;
+                    Log.info("Sending energy to " + target);
                 }
             }
         }
