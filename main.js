@@ -7342,7 +7342,10 @@ var markets = {
         Log.info("Running distribute energy");
         var receiver = null;
         var needEnergy = _.filter(myCities, city => city.storage && city.storage.store.energy < settings_1.energy.processPower - 250000 && city.terminal);
-        if (needEnergy.length){
+        if (!needEnergy.length){
+          Log.info("No city needs energy");
+        }
+         else if (needEnergy.length){
             var sortedCities = _.sortBy(needEnergy, city => city.storage.store.energy);
             receiver = sortedCities[0].name;
             Log.info("Requesting energy to " + receiver);
@@ -7354,7 +7357,8 @@ var markets = {
                 }
             }
         }
-        if(!_.find(myCities, city => city.controller.level == 8)){
+         else if(!_.find(myCities, city => city.controller.level == 8)){
+           Log.info("Getting a city to RCL 8");
             //focus first city to rcl8
             const target = _.min(myCities, city => city.controller.progressTotal - city.controller.progress).name;
             for (const city of myCities){
