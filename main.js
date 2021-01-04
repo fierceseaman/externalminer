@@ -7339,6 +7339,7 @@ var markets = {
     },
 
     distributeEnergy: function(myCities){
+        Log.info("Running distribute energy");
         var receiver = null;
         var needEnergy = _.filter(myCities, city => city.storage && city.storage.store.energy < settings_1.energy.processPower - 250000 && city.terminal);
         if (needEnergy.length){
