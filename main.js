@@ -7344,6 +7344,7 @@ var markets = {
         if (needEnergy.length){
             var sortedCities = _.sortBy(needEnergy, city => city.storage.store.energy);
             receiver = sortedCities[0].name;
+            Log.info("Requesting energy to " + receiver);
             for (const city of myCities){
                 if (city.storage && city.storage.store.energy > Game.rooms[receiver].storage.store.energy + 150000 && !Memory.rooms[city.name].termUsed){
                     city.terminal.send(RESOURCE_ENERGY, 25000, receiver);
