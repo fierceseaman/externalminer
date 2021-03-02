@@ -3815,7 +3815,7 @@ var rPC = {
     },
 
     initializePowerCreep: function(creep) {
-        if(Game.shard.name != "shard3") return
+        if(Game.shard.name != "shard0") return
         if (!creep.memory.city) {
             const cities = utils.getMyCities();
             const usedRooms = _(Game.powerCreeps)
@@ -7511,25 +7511,33 @@ var markets = {
     },
     
     distributeEnergy: function(myCities){
+        Log.info("Running distribute energy");
         var receiver = null;
-        var needEnergy = _.filter(myCities, city => city.storage && city.storage.store.energy < settings_1.energy.processPower - 250000 && city.terminal);
-        if (needEnergy.length){
+        var needEnergy = _.filter(myCities, city => city.storage && city.storage.store.energy < settings_1.energy.processPower && city.terminal);
+        if (!needEnergy.length){
+          Log.info("No city needs energy");
+        }
+         else if (needEnergy.length){
             var sortedCities = _.sortBy(needEnergy, city => city.storage.store.energy);
             receiver = sortedCities[0].name;
+            Log.info("Requesting energy to " + receiver);
             for (const city of myCities){
                 if (city.storage && city.storage.store.energy > Game.rooms[receiver].storage.store.energy + 150000 && !Memory.rooms[city.name].termUsed){
                     city.terminal.send(RESOURCE_ENERGY, 25000, receiver);
                     Memory.rooms[city.name].termUsed = true;
+                    Log.info("Sending energy to " + receiver);
                 }
             }
         }
-        if(!_.find(myCities, city => city.controller.level == 8)){
+         else if(!_.find(myCities, city => city.controller.level == 8)){
+           Log.info("Getting a city to RCL 8");
             //focus first city to rcl8
             const target = _.min(myCities, city => city.controller.progressTotal - city.controller.progress).name;
             for (const city of myCities){
                 if (city.name != target && city.storage && city.storage.store.energy > Game.rooms[target].storage.store.energy - 80000 && !Memory.rooms[city.name].termUsed){
                     city.terminal.send(RESOURCE_ENERGY, 25000, target);
                     Memory.rooms[city.name].termUsed = true;
+                    Log.info("Sending energy to " + target);
                 }
             }
         }
@@ -7692,10 +7700,10 @@ var markets = {
         if (needOps.length){
             receiver = needOps[0].name;
             for (const city of myCities){
-                if (city.terminal && city.terminal.store[RESOURCE_OPS] > 7000 && !Memory.rooms[city.name].termUsed){
-                    city.terminal.send(RESOURCE_OPS, 5000, receiver);
+                if (city.terminal && city.terminal.store[RESOURCE_OPS] > 700 && !Memory.rooms[city.name].termUsed){
+                    city.terminal.send(RESOURCE_OPS, 500, receiver);
                     Memory.rooms[city.name].termUsed = true;
-                    Log.info("Sending power to " + receiver);
+                    Log.info("Sending ops to " + receiver);
                     return
                 }
             }
@@ -8422,6 +8430,7 @@ var statsLib = {
         if (Game.time % settings_1.statTime == 1){
             RawMemory.setActiveSegments([]);
             const stats = {};
+	    stats["game.time"] = Game.time;
             stats["cpu.getUsed"] = Game.cpu.getUsed();
             stats["cpu.bucket"] = Game.cpu.bucket;
             stats["gcl.progress"] = Game.gcl.progress;
@@ -8714,7 +8723,7 @@ const p = {
     },
 
     expand: function(){
-        if(Game.cpu.bucket != 10000 || Memory.flags["claim"] || !PServ) return
+        if(Game.cpu.bucket != 10000 || Memory.flags["claim"]) return
         const myCities = utils.getMyCities();
         if(Game.gcl.level == myCities.length) return
         const candidates = _.reject(Cache.roomData, room => !room.score 
@@ -8952,7 +8961,7 @@ const p = {
                 room.memory.plan.y = spawnPos.y + template.offset.y - template.buildings.spawn.pos[0].y;
             }
             const planFlag = Memory.flags.plan;
-            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == "Yoner"){
+            if(planFlag && planFlag.roomName == roomName && room.controller.owner && room.controller.owner.username == "FierceSeaman"){
                 room.memory.plan = {};
                 room.memory.plan.x = planFlag.x;
                 room.memory.plan.y = planFlag.y;
@@ -10017,7 +10026,7 @@ commonjsGlobal.BuyToken = function(price) {
         resourceType: SUBSCRIPTION_TOKEN,
         price: price * 1e6,
         totalAmount: 1,
-        roomName: "E11S22" 
+        roomName: "E7S9" 
     });
 };
 commonjsGlobal.SpawnQuad = function(city, boosted){
