@@ -7,10 +7,10 @@ var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof win
 const username = Object.values(Game.structures).concat(Object.values(Game.creeps), Object.values(Game.powerCreeps), Object.values(Game.constructionSites))[0].owner.username;
 var settings = {
     username: "FierceSeaman",
-    allies: [""],
+    allies: ["FierceSeaman"],
     nukeStructures: [STRUCTURE_SPAWN, STRUCTURE_LAB, STRUCTURE_STORAGE, STRUCTURE_FACTORY,
         STRUCTURE_TERMINAL, STRUCTURE_POWER_SPAWN, STRUCTURE_NUKER],
-    militaryBoosts:["XKHO2", "XGHO2", "XZHO2", "XLHO2", "XZH2O", "G"],
+    militaryBoosts:["XUH2O", "XKHO2", "XGHO2", "XZHO2", "XLHO2", "XZH2O", "G"],
     civBoosts: ["XLH2O", "XUHO2", "XKH2O", "XUH2O", "XGH2O"],
     roomplanTime: 500,
     roomplanOffset: 155,
@@ -35,7 +35,7 @@ var settings = {
         colony: 4000, // building new rooms
         upgrade: 4500,
         energyMining: 4000,
-        powerMining: 8000,
+        powerMining: 5000,
         mineralMining: 8000,
         // other constants we use with these
         range: 3000, //this keeps all power mining from shutting off at once.
@@ -45,9 +45,9 @@ var settings = {
     },
     energy: {//energy thresholds
         repair: 60000,
-        rcl8upgrade: 450000,
-        processPower: 400000,
-        powerMine: 450000
+        rcl8upgrade: 350000,
+        processPower: 300000,
+        powerMine: 350000
     },
     max: {
         upgraders: 6, // low rcl
