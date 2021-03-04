@@ -5872,7 +5872,6 @@ var rM = {
         }
         if(!creep.memory.miningPos){
             creep.memory.miningPos = rM.getDestination(creep, source);
-            if(!creep.memory.miningPos)
                 return
         }
         const miningPos = new RoomPosition(creep.memory.miningPos.x, creep.memory.miningPos.y, creep.memory.miningPos.roomName);
@@ -5915,6 +5914,9 @@ var rM = {
             return containerSite.pos
         }
         //look for empty space to mine
+        if(creep.memory.source == "55c34a6c5be41a0a6e80c9a6"){
+          return new RoomPosition("18", "26", "W9N1")
+        }
         for(let i = source.pos.x - 1; i <= source.pos.x + 1; i++){
             for(let j = source.pos.y - 1;j <= source.pos.y + 1; j++){
                 if(!rM.isPositionBlocked(new RoomPosition(i, j, source.pos.roomName)))
