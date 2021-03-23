@@ -5880,9 +5880,6 @@ var rM = {
     },
 
     getLinkMiningPos: function(link, source){
-        if(source == "55c34a6c5be41a0a6e80c9a6"){
-          return new RoomPosition("18", "26", "W9N1")
-        }
         for(let i = link.pos.x - 1; i <= link.pos.x + 1; i++){
             for(let j = link.pos.y - 1; j <= link.pos.y + 1; j++){
                 const testPos = new RoomPosition(i, j, link.pos.roomName);
@@ -5894,6 +5891,9 @@ var rM = {
     },
 
     getDestination: function(creep, source) {
+        if(creep.memory.source == "55c34a6c5be41a0a6e80c9a6"){
+          return new RoomPosition("18", "26", "W9N1")
+        }
         //look for links
         const link = rM.findStruct(creep, source, STRUCTURE_LINK);
         if(link){
@@ -5917,9 +5917,6 @@ var rM = {
             return containerSite.pos
         }
         //look for empty space to mine
-        if(creep.memory.source == "55c34a6c5be41a0a6e80c9a6"){
-          return new RoomPosition("18", "26", "W9N1")
-        }
         for(let i = source.pos.x - 1; i <= source.pos.x + 1; i++){
             for(let j = source.pos.y - 1;j <= source.pos.y + 1; j++){
                 if(!rM.isPositionBlocked(new RoomPosition(i, j, source.pos.roomName)))
