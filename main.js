@@ -5880,7 +5880,7 @@ var rM = {
     },
 
     getLinkMiningPos: function(link, source){
-        if(creep.memory.source == "55c34a6c5be41a0a6e80c9a6"){
+        if(source == "55c34a6c5be41a0a6e80c9a6"){
           return new RoomPosition("18", "26", "W9N1")
         }
         for(let i = link.pos.x - 1; i <= link.pos.x + 1; i++){
