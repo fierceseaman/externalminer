@@ -8726,7 +8726,7 @@ const p = {
     },
 
     expand: function(){
-        if(Game.cpu.bucket != 10000 || Memory.flags["claim"] || Game.shard.name.includes("shard")) return
+        if(Game.cpu.bucket != 10000 || Memory.flags["claim"]) return
         const myCities = utils.getMyCities();
         if(Game.gcl.level == myCities.length) return
         const candidates = _.reject(Cache.roomData, room => !room.score
