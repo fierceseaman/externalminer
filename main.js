@@ -5891,9 +5891,8 @@ var rM = {
     },
 
     getDestination: function(creep, source) {
-        if(creep.memory.source == "55c34a6c5be41a0a6e80c9a6"){
-          creep.memory.link = "6058ec1146919ecfe779488e";
-          return new RoomPosition("18", "26", "W9N1")
+        if(creep.memory.source == "5bbcacf29099fc012e636626"){
+            return new RoomPosition("42", "7", "E1N47")
         }
         //look for links
         const link = rM.findStruct(creep, source, STRUCTURE_LINK);
